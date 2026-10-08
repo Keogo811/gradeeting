@@ -9,8 +9,12 @@ const listContainer = document.getElementById("volunteers-list");
 const detailContainer = document.getElementById("volunteer-detail");
 const detailContent = document.getElementById("detail-content");
 const backButton = document.getElementById("back-button");
+const searchInput = document.getElementById("search-input");
+const classFilter = document.getElementById("class-filter");
+const clearFiltersBtn = document.getElementById("clear-filters");
 
 let currentVolunteerId = null;
+let allVolunteers = [];
 
 const PLACEHOLDER = "https://placehold.co/300x180?text=No+Photo";
 
@@ -20,7 +24,7 @@ async function loadVolunteers() {
 
   const { data, error } = await supabaseClient
     .from("volunteers")
-    .select("id, name, photo_url, description")
+    .select("id, name, photo_url, description, class")
     .eq("status", "approved")
     .order("name", { ascending: true });
 
@@ -36,15 +40,30 @@ async function loadVolunteers() {
     return;
   }
 
+  allVolunteers = data;
+  populateClassFilter(data);
   renderVolunteers(data);
 }
 
-// 3. Afficher les volontaires
+// 3. Remplir le filtre de classes
+function populateClassFilter(volunteers) {
+  const classes = [...new Set(volunteers.map((v) => v.class).filter(Boolean))].sort();
+
+  classFilter.innerHTML = '<option value="">All classes</option>';
+  classes.forEach((c) => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    classFilter.appendChild(opt);
+  });
+}
+
+// 4. Afficher les volontaires
 function renderVolunteers(volunteers) {
   listContainer.innerHTML = "";
 
   if (volunteers.length === 0) {
-    listContainer.innerHTML = '<p class="empty">No volunteers yet. Check back soon!</p>';
+    listContainer.innerHTML = '<p class="empty">No volunteers match your search.</p>';
     return;
   }
 
@@ -70,22 +89,50 @@ function renderVolunteers(volunteers) {
     card.appendChild(img);
     card.appendChild(name);
     card.appendChild(desc);
+
+    if (v.class) {
+      const classTag = document.createElement("span");
+      classTag.className = "class-tag";
+      classTag.textContent = v.class;
+      card.appendChild(classTag);
+    }
+
     listContainer.appendChild(card);
   });
 }
 
-// 4. Afficher le détail d'un volontaire
+// 5. Appliquer les filtres
+function applyFilters() {
+  const search = searchInput.value.trim().toLowerCase();
+  const selectedClass = classFilter.value;
+
+  const filtered = allVolunteers.filter((v) => {
+    const matchName = v.name.toLowerCase().includes(search);
+    const matchClass = !selectedClass || v.class === selectedClass;
+    return matchName && matchClass;
+  });
+
+  renderVolunteers(filtered);
+}
+
+// 6. Réinitialiser les filtres
+function clearFilters() {
+  searchInput.value = "";
+  classFilter.value = "";
+  renderVolunteers(allVolunteers);
+}
+
+// 7. Afficher le détail d'un volontaire
 async function showVolunteerDetail(volunteerId) {
   currentVolunteerId = volunteerId;
 
-  // Afficher le conteneur avec un état de chargement
   listContainer.style.display = "none";
   detailContainer.style.display = "block";
   detailContent.innerHTML = '<p class="loading">Loading profile...</p>';
 
   const { data: volunteer, error: volError } = await supabaseClient
     .from("volunteers")
-    .select("id, name, photo_url, description")
+    .select("id, name, photo_url, description, class")
     .eq("id", volunteerId)
     .single();
 
@@ -115,12 +162,14 @@ async function showVolunteerDetail(volunteerId) {
   }
 
   const photo = volunteer.photo_url || PLACEHOLDER;
+  const classLine = volunteer.class ? `<p class="detail-class">${volunteer.class}</p>` : "";
 
   detailContent.innerHTML = `
     <div class="detail-header">
       <img src="${photo}" alt="${volunteer.name}" onerror="this.src='${PLACEHOLDER}'">
       <div>
         <h2>${volunteer.name}</h2>
+        ${classLine}
         <p>${volunteer.description || ""}</p>
       </div>
     </div>
@@ -196,7 +245,7 @@ async function showVolunteerDetail(volunteerId) {
   setupCommentForm();
 }
 
-// 5. Brancher le formulaire
+// 8. Brancher le formulaire
 function setupCommentForm() {
   const form = document.getElementById("comment-form");
   const explanationBlock = document.getElementById("explanation-block");
@@ -263,7 +312,7 @@ function setupCommentForm() {
   });
 }
 
-// 6. Revenir à la liste
+// 9. Revenir à la liste
 function showList() {
   detailContainer.style.display = "none";
   listContainer.style.display = "grid";
@@ -273,8 +322,13 @@ function showList() {
 
 backButton.addEventListener("click", showList);
 
-// 7. Lancer au chargement
+// 10. Brancher les filtres
+searchInput.addEventListener("input", applyFilters);
+classFilter.addEventListener("change", applyFilters);
+clearFiltersBtn.addEventListener("click", clearFilters);
+
+// 11. Lancer au chargement
 loadVolunteers();
 
-// 8. Année dynamique dans le footer
+// 12. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

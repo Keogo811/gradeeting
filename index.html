@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GRADEETING</title>
+  <title>Gradeeting</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
-    <h1>GRADEETING</h1>
+    <h1>Gradeeting</h1>
     <p class="tagline">Discover the Aivancity community</p>
   </header>
+
+  <!-- Barre de recherche et filtres -->
+  <div class="filters">
+    <input type="text" id="search-input" placeholder="Search by name...">
+    <select id="class-filter">
+      <option value="">All classes</option>
+    </select>
+    <button id="clear-filters" type="button">Clear</button>
+  </div>
 
   <!-- Liste des volontaires -->
   <div id="volunteers-list">
@@ -54,7 +63,7 @@
     <h3>Contact</h3>
     <p>
       To become a volunteer, to request removal, or to report a comment:
-      contact the admin directly at school or message.
+      contact the admin directly at school.
     </p>
   </section>
 
