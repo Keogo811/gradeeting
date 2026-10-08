@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRADEETING</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>GRADEETING</h1>
+    <p class="tagline">Discover the volunteers of Aivancity</p>
+  </header>
+
+  <!-- Liste des volontaires -->
+  <div id="volunteers-list">
+    <!-- Volunteer cards will appear here -->
+  </div>
+
+  <!-- Détail d'un volontaire (caché au départ) -->
+  <div id="volunteer-detail" style="display: none;">
+    <button id="back-button">← Back to list</button>
+    <div id="detail-content">
+      <!-- Détail du volontaire et commentaires -->
+    </div>
+  </div>
+
+  <!-- À propos / Règles -->
+  <section class="about-section">
+    <h2>About Gradeeting</h2>
+    <p>
+      Gradeeting is a voluntary platform made by and for Aivancity students.
+      It helps you recognize faces on campus and start conversations more easily —
+      especially if you are shy or new.
+    </p>
+    <h3>Rules</h3>
+    <ul>
+      <li>Only volunteers appear. It is 100% voluntary.</li>
+      <li>No account needed. Comments are anonymous.</li>
+      <li>Be honest, but constructive.</li>
+      <li>Negative comments <strong>must</strong> include an explanation, or they will be rejected.</li>
+      <li>All comments are moderated before appearing.</li>
+      <li>Any visitor can be added as a volunteer by contacting the admin.</li>
+    </ul>
+
+    <h3>Legal & privacy</h3>
+    <p>
+      This platform is a student project. Photos and names are published only with the
+      explicit consent of the volunteers. Any volunteer can request the removal of their
+      profile or a comment at any time by contacting the admin. No personal data is
+      collected from visitors, and no cookies or tracking are used.
+    </p>
+
+    <h3>Contact</h3>
+    <p>
+      To become a volunteer, to request removal, or to report a comment:
+      contact the admin directly at school or message.
+    </p>
+  </section>
+
+  <footer class="site-footer">
+    <p>Gradeeting — Aivancity student project — <span id="year"></span></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
