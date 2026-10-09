@@ -1156,5 +1156,57 @@ async function initVisitCounter() {
 
 initVisitCounter();
 
-// 25. Année dynamique dans le footer
+// 25. Musique de fond
+const MUSIC_KEY = "gradeeting_music_on";
+
+function initBackgroundMusic() {
+  const audio = document.getElementById("bg-music");
+  const btn = document.getElementById("music-toggle");
+  if (!audio || !btn) return;
+
+  function updateUI(playing) {
+    btn.textContent = playing ? "🔊" : "🔇";
+    btn.classList.toggle("playing", playing);
+    btn.setAttribute("aria-label", playing ? "Pause music" : "Play music");
+  }
+
+  // Restaurer la préférence
+  const wantsMusic = localStorage.getItem(MUSIC_KEY) === "on";
+
+  // Le navigateur exige un clic pour démarrer l'audio.
+  // Si l'utilisateur avait activé la musique, on tente de la relancer
+  // au premier clic n'importe où sur la page.
+  function armAutoRestart() {
+    if (!wantsMusic) return;
+    const tryPlay = () => {
+      audio.play().then(() => {
+        updateUI(true);
+        document.removeEventListener("click", tryPlay);
+      }).catch(() => {});
+    };
+    document.addEventListener("click", tryPlay, { once: true });
+  }
+
+  btn.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play().then(() => {
+        updateUI(true);
+        localStorage.setItem(MUSIC_KEY, "on");
+      }).catch((err) => {
+        console.error("Erreur lecture audio :", err);
+      });
+    } else {
+      audio.pause();
+      updateUI(false);
+      localStorage.setItem(MUSIC_KEY, "off");
+    }
+  });
+
+  updateUI(false);
+  armAutoRestart();
+}
+
+initBackgroundMusic();
+
+// 26. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

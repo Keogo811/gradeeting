@@ -1214,6 +1214,40 @@ h1 {
   padding: 0;
 }
 
+.music-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 4.2rem;
+  background: var(--white);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-size: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+
+.music-toggle:hover {
+  transform: scale(1.05);
+  border-color: var(--rose);
+}
+
+.music-toggle.playing {
+  border-color: var(--rose);
+  background: var(--rose-soft);
+  animation: music-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes music-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
 .theme-toggle:hover {
   transform: rotate(15deg) scale(1.05);
   border-color: var(--rose);
