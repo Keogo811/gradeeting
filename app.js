@@ -81,6 +81,33 @@ async function loadVolunteers() {
   allVolunteers = shuffleArray(data);
   populateClassFilter(data);
   renderVolunteers(allVolunteers);
+  updateStats(allVolunteers);
+  loadCommentCount();
+}
+
+// Calcul des stats à partir des volontaires chargés
+function updateStats(volunteers) {
+  const total = volunteers.length;
+  const teachers = volunteers.filter((v) => normalizeClass(v.class) === "Teacher").length;
+
+  document.getElementById("stat-volunteers").textContent = total;
+  document.getElementById("stat-teachers").textContent = teachers;
+}
+
+// Nombre total de commentaires approuvés
+async function loadCommentCount() {
+  const { count, error } = await supabaseClient
+    .from("comments")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "approved");
+
+  if (error) {
+    console.error("Erreur count commentaires :", error.message);
+    document.getElementById("stat-comments").textContent = "—";
+    return;
+  }
+
+  document.getElementById("stat-comments").textContent = count;
 }
 
 // 3. Remplir le filtre de classes
@@ -200,6 +227,8 @@ async function showVolunteerDetail(volunteerId) {
     console.error("Erreur commentaires :", comError.message);
   }
 
+  // Bouton Share
+  // (ajouté plus bas dans le HTML)
   const photo = volunteer.photo_url || PLACEHOLDER;
   const normalizedClass = normalizeClass(volunteer.class);
   const classLine = normalizedClass ? `<p class="detail-class">${normalizedClass}</p>` : "";
@@ -233,6 +262,7 @@ async function showVolunteerDetail(volunteerId) {
         <h2>${volunteer.name}${pronounBadge}</h2>
         ${classLine}
         <p>${volunteer.description || ""}</p>
+        <button class="share-button" id="share-button">🔗 Share this profile</button>
       </div>
     </div>
 
@@ -313,6 +343,7 @@ async function showVolunteerDetail(volunteerId) {
   }
 
   setupCommentForm();
+  setupShareButton(volunteer);
 }
 
 // 8. Brancher le formulaire
@@ -388,6 +419,9 @@ function showList() {
   listContainer.style.display = "grid";
   detailContent.innerHTML = "";
   currentVolunteerId = null;
+  if (window.location.hash.startsWith("#volunteer=")) {
+    history.replaceState(null, "", window.location.pathname);
+  }
 }
 
 backButton.addEventListener("click", showList);
@@ -399,6 +433,7 @@ clearFiltersBtn.addEventListener("click", clearFilters);
 
 // 11. Lancer au chargement
 loadVolunteers();
+handleHashOnLoad();
 
 // 12. Ouvrir le formulaire de signalement
 function openReportForm(commentId, card) {
@@ -610,5 +645,53 @@ navVolunteer.addEventListener("click", () => {
   document.getElementById("open-signup").click();
 });
 
-// 17. Année dynamique dans le footer
+// 17. Bouton Share
+function setupShareButton(volunteer) {
+  const shareBtn = document.getElementById("share-button");
+  if (!shareBtn) return;
+
+  const shareUrl = `${window.location.origin}${window.location.pathname}#volunteer=${volunteer.id}`;
+  const shareText = `Check out ${volunteer.name} on Gradeeting`;
+
+  shareBtn.addEventListener("click", async () => {
+    // Sur mobile : utilise le partage natif
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Gradeeting",
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      } catch (e) {
+        // L'utilisateur a annulé ou erreur → fallback copie
+      }
+    }
+
+    // Fallback : copie dans le presse-papier
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      shareBtn.textContent = "✅ Link copied!";
+      setTimeout(() => {
+        shareBtn.textContent = "🔗 Share this profile";
+      }, 2000);
+    } catch (e) {
+      console.error("Erreur copie :", e);
+      prompt("Copy this link:", shareUrl);
+    }
+  });
+}
+
+// 19. Ouvrir un profil via #volunteer=<id> dans l'URL
+function handleHashOnLoad() {
+  const hash = window.location.hash;
+  const match = hash.match(/^#volunteer=([0-9a-f-]{36})$/i);
+  if (match) {
+    showVolunteerDetail(match[1]);
+  }
+}
+
+window.addEventListener("hashchange", handleHashOnLoad);
+
+// 19. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
