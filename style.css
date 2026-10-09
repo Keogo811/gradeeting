@@ -17,6 +17,23 @@
   --radius-lg: 24px;
 }
 
+[data-theme="dark"] {
+  --cream: #1E1819;
+  --cream-deep: #2A2123;
+  --white: #2E2527;
+  --rose: #F07C90;
+  --rose-deep: #E85D75;
+  --rose-soft: #4A2C33;
+  --honey: #FFB627;
+  --honey-soft: #4A3A1E;
+  --text: #F5EBE8;
+  --text-muted: #B8A2A5;
+  --border: #3E2F32;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -25,12 +42,14 @@
 
 body {
   font-family: 'Nunito', system-ui, sans-serif;
-  background: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+  background: var(--cream);
+  background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
   background-attachment: fixed;
   color: var(--text);
   padding: 1.5rem;
   line-height: 1.6;
   min-height: 100vh;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 /* ---------- Header ---------- */
@@ -1130,6 +1149,70 @@ h1 {
     width: 90px;
     height: 90px;
   }
+}
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--white);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font-size: 1.1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s;
+  line-height: 1;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  transform: rotate(15deg) scale(1.05);
+  border-color: var(--rose);
+}
+
+.site-header {
+  position: relative;
+}
+
+[data-theme="dark"] .volunteer-card:hover {
+  border-color: var(--rose);
+}
+
+[data-theme="dark"] .disclaimer {
+  color: #F5EBE8;
+}
+
+[data-theme="dark"] .report-form {
+  background: #241C1E;
+}
+
+[data-theme="dark"] .filters input,
+[data-theme="dark"] .filters select {
+  background: var(--white);
+  color: var(--text);
+}
+
+[data-theme="dark"] .hint {
+  color: #F5EBE8;
+}
+
+[data-theme="dark"] .featured-section {
+  background: linear-gradient(135deg, #3A2729 0%, #4A2C33 100%);
+  border-color: var(--rose-soft);
+}
+
+[data-theme="dark"] .featured-info h2 {
+  color: var(--rose);
+}
+
+[data-theme="dark"] .featured-joke {
+  color: var(--text-muted) !important;
+  border-top-color: var(--rose-soft);
 }
 
 /* ---------- Responsive ---------- */
