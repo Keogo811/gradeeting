@@ -13,6 +13,12 @@ const adminPanel = document.getElementById("admin-panel");
 const adminEmail = document.getElementById("admin-email");
 const logoutButton = document.getElementById("logout-button");
 
+const pendingCommentsEl = document.getElementById("pending-comments");
+const pendingVolunteersEl = document.getElementById("pending-volunteers");
+const reportsListEl = document.getElementById("reports-list");
+
+const PLACEHOLDER = "https://placehold.co/200x200?text=No+Photo";
+
 // 3. Vérifier la session au chargement
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
@@ -24,21 +30,19 @@ async function checkSession() {
   }
 }
 
-// 4. Afficher le panel admin
 function showAdminPanel(email) {
   loginScreen.classList.add("hidden");
   adminPanel.classList.remove("hidden");
   adminEmail.textContent = email;
-  // Les listes seront chargées dans le Morceau 3
+  loadAll();
 }
 
-// 5. Afficher l'écran de login
 function showLoginScreen() {
   adminPanel.classList.add("hidden");
   loginScreen.classList.remove("hidden");
 }
 
-// 6. Login
+// 4. Login
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -70,11 +74,263 @@ loginForm.addEventListener("submit", async (e) => {
   showAdminPanel(data.user.email);
 });
 
-// 7. Logout
+// 5. Logout
 logoutButton.addEventListener("click", async () => {
   await supabaseClient.auth.signOut();
   showLoginScreen();
 });
 
-// 8. Lancer au chargement
+// 6. Tout charger
+function loadAll() {
+  loadPendingComments();
+  loadPendingVolunteers();
+  loadReports();
+}
+
+// ---------- COMMENTAIRES EN ATTENTE ----------
+async function loadPendingComments() {
+  pendingCommentsEl.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("comments")
+    .select("id, body, sentiment, explanation, created_at, volunteers(name)")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement commentaires :", error.message);
+    pendingCommentsEl.innerHTML = '<p class="empty-state">Error loading comments.</p>';
+    return;
+  }
+
+  if (data.length === 0) {
+    pendingCommentsEl.innerHTML = '<p class="empty-state">No pending comments.</p>';
+    return;
+  }
+
+  pendingCommentsEl.innerHTML = "";
+  data.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const volunteerName = c.volunteers ? c.volunteers.name : "Unknown";
+    const tagClass = c.sentiment === "positive" ? "tag-positive" : "tag-negative";
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div class="admin-card-title">About ${escapeHtml(volunteerName)}</div>
+        <div class="admin-card-meta">${new Date(c.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        <span class="tag ${tagClass}">${c.sentiment}</span>
+        <p style="margin-top: 0.5rem;">${escapeHtml(c.body)}</p>
+        ${c.explanation ? `<p style="margin-top:0.5rem;font-style:italic;color:#666;">Explanation: ${escapeHtml(c.explanation)}</p>` : ""}
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const approveBtn = document.createElement("button");
+    approveBtn.className = "btn-approve";
+    approveBtn.textContent = "Approve";
+    approveBtn.addEventListener("click", () => updateComment(c.id, "approved"));
+
+    const rejectBtn = document.createElement("button");
+    rejectBtn.className = "btn-reject";
+    rejectBtn.textContent = "Reject";
+    rejectBtn.addEventListener("click", () => updateComment(c.id, "rejected"));
+
+    actions.appendChild(approveBtn);
+    actions.appendChild(rejectBtn);
+    card.appendChild(actions);
+
+    pendingCommentsEl.appendChild(card);
+  });
+}
+
+async function updateComment(commentId, newStatus) {
+  const { error } = await supabaseClient
+    .from("comments")
+    .update({ status: newStatus })
+    .eq("id", commentId);
+
+  if (error) {
+    console.error("Erreur mise à jour :", error.message);
+    alert("Error updating comment. Please try again.");
+    return;
+  }
+
+  loadPendingComments();
+}
+
+// ---------- VOLONTAIRES EN ATTENTE ----------
+async function loadPendingVolunteers() {
+  pendingVolunteersEl.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("volunteers")
+    .select("id, name, class, description, photo_url, consent_given, consent_date, created_at")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement volontaires :", error.message);
+    pendingVolunteersEl.innerHTML = '<p class="empty-state">Error loading volunteers.</p>';
+    return;
+  }
+
+  if (data.length === 0) {
+    pendingVolunteersEl.innerHTML = '<p class="empty-state">No pending volunteers.</p>';
+    return;
+  }
+
+  pendingVolunteersEl.innerHTML = "";
+  data.forEach((v) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const photo = v.photo_url || PLACEHOLDER;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div style="display:flex;gap:1rem;align-items:center;">
+          <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
+          <div>
+            <div class="admin-card-title">${escapeHtml(v.name)}</div>
+            <div class="admin-card-meta">${escapeHtml(v.class || "No class")}</div>
+            <div class="admin-card-meta">Consent: ${v.consent_given ? "Yes" : "No"} ${v.consent_date ? `(${v.consent_date})` : ""}</div>
+          </div>
+        </div>
+        <div class="admin-card-meta">${new Date(v.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        <p>${escapeHtml(v.description || "")}</p>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const approveBtn = document.createElement("button");
+    approveBtn.className = "btn-approve";
+    approveBtn.textContent = "Approve";
+    approveBtn.addEventListener("click", () => updateVolunteer(v.id, "approved"));
+
+    const rejectBtn = document.createElement("button");
+    rejectBtn.className = "btn-reject";
+    rejectBtn.textContent = "Reject";
+    rejectBtn.addEventListener("click", () => updateVolunteer(v.id, "rejected"));
+
+    actions.appendChild(approveBtn);
+    actions.appendChild(rejectBtn);
+    card.appendChild(actions);
+
+    pendingVolunteersEl.appendChild(card);
+  });
+}
+
+async function updateVolunteer(volunteerId, newStatus) {
+  const { error } = await supabaseClient
+    .from("volunteers")
+    .update({ status: newStatus })
+    .eq("id", volunteerId);
+
+  if (error) {
+    console.error("Erreur mise à jour :", error.message);
+    alert("Error updating volunteer. Please try again.");
+    return;
+  }
+
+  loadPendingVolunteers();
+}
+
+// ---------- SIGNALEMENTS ----------
+async function loadReports() {
+  reportsListEl.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("reports")
+    .select("id, reason, status, created_at, comments(body, sentiment, volunteers(name))")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement reports :", error.message);
+    reportsListEl.innerHTML = '<p class="empty-state">Error loading reports.</p>';
+    return;
+  }
+
+  if (data.length === 0) {
+    reportsListEl.innerHTML = '<p class="empty-state">No pending reports.</p>';
+    return;
+  }
+
+  reportsListEl.innerHTML = "";
+  data.forEach((r) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const comment = r.comments;
+    const volunteerName = comment && comment.volunteers ? comment.volunteers.name : "Unknown";
+    const commentBody = comment ? comment.body : "(comment deleted)";
+    const commentSentiment = comment ? comment.sentiment : "unknown";
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div class="admin-card-title">Report on comment about ${escapeHtml(volunteerName)}</div>
+        <div class="admin-card-meta">${new Date(r.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        <p style="margin-bottom:0.4rem;"><strong>Reported comment:</strong></p>
+        <p style="font-style:italic;color:#666;">"${escapeHtml(commentBody)}" (${commentSentiment})</p>
+        <p style="margin-top:0.6rem;"><strong>Reason:</strong> ${escapeHtml(r.reason)}</p>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const reviewedBtn = document.createElement("button");
+    reviewedBtn.className = "btn-approve";
+    reviewedBtn.textContent = "Mark as reviewed";
+    reviewedBtn.addEventListener("click", () => updateReport(r.id, "reviewed"));
+
+    const dismissBtn = document.createElement("button");
+    dismissBtn.className = "btn-neutral";
+    dismissBtn.textContent = "Dismiss";
+    dismissBtn.addEventListener("click", () => updateReport(r.id, "dismissed"));
+
+    actions.appendChild(reviewedBtn);
+    actions.appendChild(dismissBtn);
+    card.appendChild(actions);
+
+    reportsListEl.appendChild(card);
+  });
+}
+
+async function updateReport(reportId, newStatus) {
+  const { error } = await supabaseClient
+    .from("reports")
+    .update({ status: newStatus })
+    .eq("id", reportId);
+
+  if (error) {
+    console.error("Erreur mise à jour report :", error.message);
+    alert("Error updating report. Please try again.");
+    return;
+  }
+
+  loadReports();
+}
+
+// ---------- UTILITAIRE ----------
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// 7. Lancer au chargement
 checkSession();
