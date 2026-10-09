@@ -33,7 +33,9 @@
       <!-- Détail du volontaire et commentaires -->
     </div>
   </div>
-
+<div class="become-volunteer">
+  <button id="open-signup">Become a volunteer</button>
+</div>
   <!-- À propos / Règles -->
   <section class="about-section">
     <h2>About Gradeeting</h2>
@@ -70,6 +72,40 @@
   <footer class="site-footer">
     <p>Gradeeting — Aivancity student project — <span id="year"></span></p>
   </footer>
+  
+<!-- Modal d'inscription -->
+<div id="signup-modal" class="modal hidden">
+  <div class="modal-content">
+    <button id="close-signup" class="modal-close">×</button>
+    <h2>Become a volunteer</h2>
+    <p class="modal-intro">
+      Fill this form to appear on Gradeeting. Your profile will be reviewed by the admin before appearing publicly.
+    </p>
+
+    <form id="signup-form">
+      <label>Your name *</label>
+      <input type="text" name="name" required maxlength="80" placeholder="First name + last initial or full name">
+
+      <label>Your class *</label>
+      <input type="text" name="class" required maxlength="40" placeholder="e.g. PGE2 EN">
+
+      <label>Short description *</label>
+      <textarea name="description" required maxlength="500" placeholder="A few words about you..."></textarea>
+
+      <label>Your photo *</label>
+      <input type="file" name="photo" accept="image/*" required>
+
+      <label class="consent-label">
+        <input type="checkbox" name="consent" required>
+        I agree that my name, class, photo and description appear publicly on Gradeeting.
+        I understand I can ask for removal at any time by contacting the admin.
+      </label>
+
+      <button type="submit" id="signup-submit">Submit</button>
+      <div id="signup-message" class="form-message"></div>
+    </form>
+  </div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>

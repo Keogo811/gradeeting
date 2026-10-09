@@ -398,5 +398,105 @@ function openReportForm(commentId, card) {
   card.appendChild(form);
 }
 
-// 13. Année dynamique dans le footer
+// 13. Inscription d'un volontaire
+const openSignupBtn = document.getElementById("open-signup");
+const closeSignupBtn = document.getElementById("close-signup");
+const signupModal = document.getElementById("signup-modal");
+const signupForm = document.getElementById("signup-form");
+
+openSignupBtn.addEventListener("click", () => {
+  signupModal.classList.remove("hidden");
+  document.getElementById("signup-message").textContent = "";
+  document.getElementById("signup-message").className = "form-message";
+});
+
+closeSignupBtn.addEventListener("click", () => {
+  signupModal.classList.add("hidden");
+});
+
+// Fermer si on clique en dehors
+signupModal.addEventListener("click", (e) => {
+  if (e.target === signupModal) {
+    signupModal.classList.add("hidden");
+  }
+});
+
+signupForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const message = document.getElementById("signup-message");
+  const submitBtn = document.getElementById("signup-submit");
+
+  message.textContent = "";
+  message.className = "form-message";
+
+  const name = signupForm.name.value.trim();
+  const className = signupForm.class.value.trim();
+  const description = signupForm.description.value.trim();
+  const photoFile = signupForm.photo.files[0];
+  const consent = signupForm.consent.checked;
+
+  if (!name || !className || !description || !photoFile || !consent) {
+    message.textContent = "Please fill all fields and accept the consent.";
+    message.classList.add("error");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Uploading...";
+
+  // 1. Upload de la photo
+  const fileExt = photoFile.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from("volunteer-photos")
+    .upload(fileName, photoFile);
+
+  if (uploadError) {
+    console.error("Erreur upload :", uploadError.message);
+    message.textContent = "Photo upload failed. Please try a smaller image or try again.";
+    message.classList.add("error");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    return;
+  }
+
+  // 2. Récupérer l'URL publique
+  const { data: urlData } = supabaseClient.storage
+    .from("volunteer-photos")
+    .getPublicUrl(fileName);
+
+  const photoUrl = urlData.publicUrl;
+
+  // 3. Insérer dans la table volunteers
+  submitBtn.textContent = "Submitting...";
+
+  const { error: insertError } = await supabaseClient.from("volunteers").insert({
+    name: name,
+    class: className,
+    description: description,
+    photo_url: photoUrl,
+    consent_given: true,
+    consent_date: new Date().toISOString().split("T")[0],
+    status: "pending",
+  });
+
+  if (insertError) {
+    console.error("Erreur insertion :", insertError.message);
+    message.textContent = "Something went wrong. Please try again.";
+    message.classList.add("error");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    return;
+  }
+
+  signupForm.reset();
+  message.textContent = "Thank you! Your profile will appear after admin review.";
+  message.classList.add("success");
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit";
+});
+
+// 14. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
