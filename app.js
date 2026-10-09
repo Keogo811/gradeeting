@@ -938,5 +938,69 @@ function renderFeatured(volunteers) {
   section.style.cursor = "pointer";
 }
 
-// 21. Année dynamique dans le footer
+// 21. Mini-jeu : Grow a Flower
+const GROW_STAGES = [
+  { emoji: "🌱", size: 22 }, // 0 : départ
+  { emoji: "🌿", size: 38 }, // 1
+  { emoji: "🌷", size: 54 }, // 2
+  { emoji: "🌸", size: 70 }, // 3
+  { emoji: "🌸", size: 86 }, // 4 : pleine floraison
+];
+
+function initGrowGame() {
+  const plantEl = document.getElementById("grow-plant");
+  const waterBtn = document.getElementById("grow-water");
+  const countEl = document.getElementById("grow-count");
+
+  if (!plantEl || !waterBtn || !countEl) return;
+
+  const STORAGE_KEY = "gradeeting_flowers_grown";
+  let growStage = 0;
+
+  // Compteur persistant
+  function getCount() {
+    return parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+  }
+
+  countEl.textContent = getCount();
+
+  function updatePlant() {
+    const stage = GROW_STAGES[growStage];
+    plantEl.textContent = stage.emoji;
+    plantEl.style.fontSize = stage.size + "px";
+  }
+
+  waterBtn.addEventListener("click", () => {
+    // Fin de floraison : on ne fait rien tant que le reset n'est pas fait
+    if (growStage >= GROW_STAGES.length - 1) return;
+
+    growStage++;
+    updatePlant();
+
+    // Fleur éclose
+    if (growStage === GROW_STAGES.length - 1) {
+      plantEl.classList.add("bloomed");
+      waterBtn.disabled = true;
+      waterBtn.textContent = "✨ Bloomed!";
+
+      const newCount = getCount() + 1;
+      localStorage.setItem(STORAGE_KEY, newCount);
+      countEl.textContent = newCount;
+
+      setTimeout(() => {
+        growStage = 0;
+        updatePlant();
+        plantEl.classList.remove("bloomed");
+        waterBtn.disabled = false;
+        waterBtn.textContent = "💧 Water";
+      }, 2500);
+    }
+  });
+
+  updatePlant();
+}
+
+initGrowGame();
+
+// 22. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
