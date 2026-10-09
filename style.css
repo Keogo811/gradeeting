@@ -1007,6 +1007,45 @@ h1 {
   transform: translateY(-1px);
 }
 
+/* ---------- Reactions ---------- */
+.reaction-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--cream);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.reaction-btn:hover {
+  border-color: var(--rose-soft);
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+}
+
+.reaction-btn.active {
+  background: var(--rose);
+  border-color: var(--rose-deep);
+  color: white;
+}
+
+.reaction-btn.active:hover {
+  background: var(--rose-deep);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   body {

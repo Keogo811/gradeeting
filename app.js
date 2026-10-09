@@ -18,6 +18,18 @@ let allVolunteers = [];
 
 const PLACEHOLDER = "https://placehold.co/300x180?text=No+Photo";
 
+// Identifiant visiteur anonyme (persistant dans le navigateur)
+function getVisitorId() {
+  let id = localStorage.getItem("gradeeting_visitor_id");
+  if (!id) {
+    id = (crypto.randomUUID && crypto.randomUUID()) ||
+         Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem("gradeeting_visitor_id", id);
+  }
+  return id;
+}
+const VISITOR_ID = getVisitorId();
+
 // Normalisation du champ classe
 function normalizeClass(input) {
   if (!input) return "";
@@ -227,6 +239,30 @@ async function showVolunteerDetail(volunteerId) {
     console.error("Erreur commentaires :", comError.message);
   }
 
+    // Charger les réactions pour tous les commentaires affichés
+  const reactionsByComment = {};
+  if (comments && comments.length > 0) {
+    const commentIds = comments.map((c) => c.id);
+    const { data: reactions, error: reactError } = await supabaseClient
+      .from("reactions")
+      .select("comment_id, reaction, visitor_id")
+      .in("comment_id", commentIds);
+
+    if (reactError) {
+      console.error("Erreur reactions :", reactError.message);
+    } else {
+      reactions.forEach((r) => {
+        if (!reactionsByComment[r.comment_id]) {
+          reactionsByComment[r.comment_id] = { agree: 0, disagree: 0, mine: null };
+        }
+        reactionsByComment[r.comment_id][r.reaction]++;
+        if (r.visitor_id === VISITOR_ID) {
+          reactionsByComment[r.comment_id].mine = r.reaction;
+        }
+      });
+    }
+  }
+
   // Bouton Share
   // (ajouté plus bas dans le HTML)
   const photo = volunteer.photo_url || PLACEHOLDER;
@@ -331,6 +367,29 @@ async function showVolunteerDetail(volunteerId) {
       date.className = "date";
       date.textContent = new Date(c.created_at).toLocaleDateString();
       card.appendChild(date);
+
+      // Bloc réactions
+      const stats = reactionsByComment[c.id] || { agree: 0, disagree: 0, mine: null };
+
+      const reactBar = document.createElement("div");
+      reactBar.className = "reaction-bar";
+
+      const agreeBtn = document.createElement("button");
+      agreeBtn.type = "button";
+      agreeBtn.className = "reaction-btn" + (stats.mine === "agree" ? " active" : "");
+      agreeBtn.innerHTML = `👍 <span>${stats.agree}</span>`;
+
+      const disagreeBtn = document.createElement("button");
+      disagreeBtn.type = "button";
+      disagreeBtn.className = "reaction-btn" + (stats.mine === "disagree" ? " active" : "");
+      disagreeBtn.innerHTML = `👎 <span>${stats.disagree}</span>`;
+
+      agreeBtn.addEventListener("click", () => handleReaction(c.id, "agree", agreeBtn, disagreeBtn));
+      disagreeBtn.addEventListener("click", () => handleReaction(c.id, "disagree", agreeBtn, disagreeBtn));
+
+      reactBar.appendChild(agreeBtn);
+      reactBar.appendChild(disagreeBtn);
+      card.appendChild(reactBar);
 
       const reportBtn = document.createElement("button");
       reportBtn.className = "report-button";
@@ -693,5 +752,70 @@ function handleHashOnLoad() {
 
 window.addEventListener("hashchange", handleHashOnLoad);
 
-// 19. Année dynamique dans le footer
+// 19. Gestion des réactions
+async function handleReaction(commentId, reaction, agreeBtn, disagreeBtn) {
+  const wasAgree = agreeBtn.classList.contains("active");
+  const wasDisagree = disagreeBtn.classList.contains("active");
+
+  // Cas 1 : clic sur la même réaction → on retire
+  if ((reaction === "agree" && wasAgree) || (reaction === "disagree" && wasDisagree)) {
+    const { error } = await supabaseClient
+      .from("reactions")
+      .delete()
+      .eq("comment_id", commentId)
+      .eq("visitor_id", VISITOR_ID);
+
+    if (error) { console.error(error); return; }
+
+    const btn = reaction === "agree" ? agreeBtn : disagreeBtn;
+    btn.classList.remove("active");
+    const span = btn.querySelector("span");
+    span.textContent = Math.max(0, parseInt(span.textContent, 10) - 1);
+    return;
+  }
+
+  // Cas 2 : aucune réaction → insertion
+  if (!wasAgree && !wasDisagree) {
+    const { error } = await supabaseClient.from("reactions").insert({
+      comment_id: commentId,
+      visitor_id: VISITOR_ID,
+      reaction: reaction,
+    });
+
+    if (error) { console.error(error); return; }
+
+    const btn = reaction === "agree" ? agreeBtn : disagreeBtn;
+    btn.classList.add("active");
+    const span = btn.querySelector("span");
+    span.textContent = parseInt(span.textContent, 10) + 1;
+    return;
+  }
+
+  // Cas 3 : changement de réaction
+  const { error } = await supabaseClient
+    .from("reactions")
+    .update({ reaction: reaction })
+    .eq("comment_id", commentId)
+    .eq("visitor_id", VISITOR_ID);
+
+  if (error) { console.error(error); return; }
+
+  if (wasAgree) {
+    agreeBtn.classList.remove("active");
+    const s = agreeBtn.querySelector("span");
+    s.textContent = Math.max(0, parseInt(s.textContent, 10) - 1);
+  }
+  if (wasDisagree) {
+    disagreeBtn.classList.remove("active");
+    const s = disagreeBtn.querySelector("span");
+    s.textContent = Math.max(0, parseInt(s.textContent, 10) - 1);
+  }
+
+  const newBtn = reaction === "agree" ? agreeBtn : disagreeBtn;
+  newBtn.classList.add("active");
+  const newSpan = newBtn.querySelector("span");
+  newSpan.textContent = parseInt(newSpan.textContent, 10) + 1;
+}
+
+// 20. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
