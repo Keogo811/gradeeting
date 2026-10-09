@@ -152,7 +152,30 @@ h1 {
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
   border: 2px solid transparent;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: card-in 0.4s ease forwards;
 }
+
+@keyframes card-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Délai progressif pour chaque carte (effet stagger) */
+.volunteer-card:nth-child(1)  { animation-delay: 0.00s; }
+.volunteer-card:nth-child(2)  { animation-delay: 0.05s; }
+.volunteer-card:nth-child(3)  { animation-delay: 0.10s; }
+.volunteer-card:nth-child(4)  { animation-delay: 0.15s; }
+.volunteer-card:nth-child(5)  { animation-delay: 0.20s; }
+.volunteer-card:nth-child(6)  { animation-delay: 0.25s; }
+.volunteer-card:nth-child(7)  { animation-delay: 0.30s; }
+.volunteer-card:nth-child(8)  { animation-delay: 0.35s; }
+.volunteer-card:nth-child(9)  { animation-delay: 0.40s; }
+.volunteer-card:nth-child(10) { animation-delay: 0.45s; }
+.volunteer-card:nth-child(n+11) { animation-delay: 0.5s; }
 
 .volunteer-card:hover {
   transform: translateY(-4px);
