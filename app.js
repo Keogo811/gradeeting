@@ -25,8 +25,7 @@ async function loadVolunteers() {
   const { data, error } = await supabaseClient
     .from("volunteers")
     .select("id, name, photo_url, description, class")
-    .eq("status", "approved")
-    .order("name", { ascending: true });
+    .eq("status", "approved");
 
   if (error) {
     console.error("Erreur Supabase :", error.message);
@@ -40,9 +39,9 @@ async function loadVolunteers() {
     return;
   }
 
-  allVolunteers = data;
+  allVolunteers = shuffleArray(data);
   populateClassFilter(data);
-  renderVolunteers(data);
+  renderVolunteers(allVolunteers);
 }
 
 // 3. Remplir le filtre de classes
@@ -498,5 +497,30 @@ signupForm.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Submit";
 });
 
-// 14. Année dynamique dans le footer
+// 14. Mélange aléatoire (Fisher-Yates)
+function shuffleArray(arr) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// 15. Bouton Back to top
+const backToTopBtn = document.getElementById("back-to-top");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 400) {
+    backToTopBtn.classList.remove("hidden");
+  } else {
+    backToTopBtn.classList.add("hidden");
+  }
+});
+
+backToTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// 16. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
