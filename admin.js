@@ -40,6 +40,20 @@ function normalizeClass(input) {
   return s;
 }
 
+// 2.6 Nettoyage des URLs externes
+function safeUrl(url) {
+  if (!url) return null;
+  if (!/^https?:\/\//i.test(url)) return null;
+  return url;
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // 3. Vérifier la session au chargement
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
@@ -191,7 +205,7 @@ async function loadPendingVolunteers() {
 
   const { data, error } = await supabaseClient
     .from("volunteers")
-    .select("id, name, class, description, photo_url, consent_given, consent_date, created_at")
+    .select("id, name, class, description, photo_url, consent_given, consent_date, created_at, pronouns, instagram, snapchat, linkedin, contact_email")
     .eq("status", "pending")
     .order("created_at", { ascending: false });
 
@@ -218,9 +232,15 @@ async function loadPendingVolunteers() {
         <div style="display:flex;gap:1rem;align-items:center;">
           <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
           <div>
-            <div class="admin-card-title">${escapeHtml(v.name)}</div>
+            <div class="admin-card-title">${escapeHtml(v.name)}${v.pronouns ? ` <span class="tag tag-pending">${escapeHtml(v.pronouns)}</span>` : ""}</div>
             <div class="admin-card-meta">${escapeHtml(normalizeClass(v.class) || "No class")}</div>
             <div class="admin-card-meta">Consent: ${v.consent_given ? "Yes" : "No"} ${v.consent_date ? `(${v.consent_date})` : ""}</div>
+            <div class="admin-card-meta">
+              ${v.instagram ? `IG: ${escapeHtml(v.instagram)} · ` : ""}
+              ${v.snapchat ? `Snap: ${escapeHtml(v.snapchat)} · ` : ""}
+              ${v.linkedin ? `LI ✓ · ` : ""}
+              ${v.contact_email ? `Email: ${escapeHtml(v.contact_email)}` : ""}
+            </div>
           </div>
         </div>
         <div class="admin-card-meta">${new Date(v.created_at).toLocaleString()}</div>

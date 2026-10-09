@@ -104,6 +104,19 @@
         <label>Short description *</label>
         <textarea name="description" required maxlength="500" placeholder="A few words about you..."></textarea>
 
+        <label>Pronouns (optional)</label>
+        <div class="pronoun-choice">
+          <label><input type="radio" name="pronouns" value="he"> he</label>
+          <label><input type="radio" name="pronouns" value="she"> she</label>
+          <label><input type="radio" name="pronouns" value="?"> ?</label>
+        </div>
+
+        <label>Social links (optional, leave blank if you don't want to share)</label>
+        <input type="text" name="instagram" maxlength="50" placeholder="Instagram username">
+        <input type="text" name="snapchat" maxlength="50" placeholder="Snapchat username">
+        <input type="url" name="linkedin" maxlength="200" placeholder="LinkedIn profile URL">
+        <input type="email" name="contact_email" maxlength="100" placeholder="Contact email">
+
         <label>Your photo *</label>
         <input type="file" name="photo" accept="image/*" required>
 

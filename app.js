@@ -44,14 +44,27 @@ function normalizeClass(input) {
   return s;
 }
 
+function safeUrl(url) {
+  if (!url) return null;
+  if (!/^https?:\/\//i.test(url)) return null;
+  return url;
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // 2. Charger les volontaires approuvés
 async function loadVolunteers() {
   listContainer.innerHTML = '<p class="loading">Loading volunteers...</p>';
 
   const { data, error } = await supabaseClient
     .from("volunteers")
-    .select("id, name, photo_url, description, class")
-    .eq("status", "approved");
+    .select("id, name, photo_url, description, class, pronouns, instagram, snapchat, linkedin, contact_email")
+    .eq("id", volunteerId)
 
   if (error) {
     console.error("Erreur Supabase :", error.message);
@@ -191,15 +204,39 @@ async function showVolunteerDetail(volunteerId) {
   const normalizedClass = normalizeClass(volunteer.class);
   const classLine = normalizedClass ? `<p class="detail-class">${normalizedClass}</p>` : "";
 
+  const pronounBadge = volunteer.pronouns
+    ? `<span class="pronoun-badge">${escapeHtml(volunteer.pronouns)}</span>`
+    : "";
+
+  const socialLinks = [];
+  if (volunteer.instagram) {
+    socialLinks.push(`<a class="social-link" href="https://instagram.com/${encodeURIComponent(volunteer.instagram)}" target="_blank" rel="noopener">Instagram</a>`);
+  }
+  if (volunteer.snapchat) {
+    socialLinks.push(`<a class="social-link" href="https://snapchat.com/add/${encodeURIComponent(volunteer.snapchat)}" target="_blank" rel="noopener">Snapchat</a>`);
+  }
+  const li = safeUrl(volunteer.linkedin);
+  if (li) {
+    socialLinks.push(`<a class="social-link" href="${li}" target="_blank" rel="noopener">LinkedIn</a>`);
+  }
+  if (volunteer.contact_email) {
+    socialLinks.push(`<a class="social-link" href="mailto:${encodeURIComponent(volunteer.contact_email)}">Email</a>`);
+  }
+  const socialBlock = socialLinks.length
+    ? `<div class="social-links">${socialLinks.join("")}</div>`
+    : "";
+
   detailContent.innerHTML = `
     <div class="detail-header">
       <img src="${photo}" alt="${volunteer.name}" onerror="this.src='${PLACEHOLDER}'">
       <div>
-        <h2>${volunteer.name}</h2>
+        <h2>${volunteer.name}${pronounBadge}</h2>
         ${classLine}
         <p>${volunteer.description || ""}</p>
       </div>
     </div>
+
+    ${socialBlock}
 
     <div class="comments-section">
       <h3>Comments</h3>
@@ -462,6 +499,11 @@ signupForm.addEventListener("submit", async (e) => {
   const description = signupForm.description.value.trim();
   const photoFile = signupForm.photo.files[0];
   const consent = signupForm.consent.checked;
+  const pronouns = signupForm.pronouns.value || null;
+  const instagram = signupForm.instagram.value.trim() || null;
+  const snapchat = signupForm.snapchat.value.trim() || null;
+  const linkedin = signupForm.linkedin.value.trim() || null;
+  const contactEmail = signupForm.contact_email.value.trim() || null;
 
   if (!name || !className || !description || !photoFile || !consent) {
     message.textContent = "Please fill all fields and accept the consent.";
@@ -507,6 +549,11 @@ signupForm.addEventListener("submit", async (e) => {
     consent_given: true,
     consent_date: new Date().toISOString().split("T")[0],
     status: "pending",
+    pronouns: pronouns,
+    instagram: instagram,
+    snapchat: snapchat,
+    linkedin: linkedin,
+    contact_email: contactEmail,
   });
 
   if (insertError) {
