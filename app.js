@@ -63,8 +63,8 @@ async function loadVolunteers() {
 
   const { data, error } = await supabaseClient
     .from("volunteers")
-    .select("id, name, photo_url, description, class, pronouns, instagram, snapchat, linkedin, contact_email")
-    .eq("id", volunteerId)
+    .select("id, name, photo_url, description, class")
+    .eq("status", "approved");
 
   if (error) {
     console.error("Erreur Supabase :", error.message);
