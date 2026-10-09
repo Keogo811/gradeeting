@@ -1002,5 +1002,96 @@ function initGrowGame() {
 
 initGrowGame();
 
-// 22. Année dynamique dans le footer
+// 22. Mini-jeu : Flower Memory
+const MEMORY_FLOWERS = ["🌸", "🌷", "🌻", "🌺"];
+
+function initMemoryGame() {
+  const gridEl = document.getElementById("memory-grid");
+  const resetBtn = document.getElementById("memory-reset");
+  const pairsEl = document.getElementById("memory-pairs");
+
+  if (!gridEl || !resetBtn || !pairsEl) return;
+
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let pairsFound = 0;
+
+  function shuffle(arr) {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function buildGrid() {
+    gridEl.innerHTML = "";
+    pairsEl.textContent = "0";
+    pairsFound = 0;
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+
+    const deck = shuffle([...MEMORY_FLOWERS, ...MEMORY_FLOWERS]);
+
+    deck.forEach((flower) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "memory-card";
+      btn.textContent = flower;
+      btn.addEventListener("click", () => flipCard(btn));
+      gridEl.appendChild(btn);
+    });
+  }
+
+  function flipCard(card) {
+    if (lockBoard) return;
+    if (card === firstCard) return;
+    if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
+
+    card.classList.add("flipped");
+
+    if (!firstCard) {
+      firstCard = card;
+      return;
+    }
+
+    secondCard = card;
+    lockBoard = true;
+
+    if (firstCard.textContent === secondCard.textContent) {
+      // Paire trouvée
+      setTimeout(() => {
+        firstCard.classList.add("matched");
+        secondCard.classList.add("matched");
+        pairsFound++;
+        pairsEl.textContent = pairsFound;
+        resetTurn();
+      }, 400);
+    } else {
+      // Mauvaise paire
+      setTimeout(() => {
+        firstCard.classList.remove("flipped");
+        secondCard.classList.remove("flipped");
+        resetTurn();
+      }, 800);
+    }
+  }
+
+  function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+  }
+
+  resetBtn.addEventListener("click", buildGrid);
+
+  buildGrid();
+}
+
+initMemoryGame();
+
+// 23. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

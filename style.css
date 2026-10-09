@@ -1394,6 +1394,60 @@ h1 {
   background: linear-gradient(180deg, #E85D75 0%, #C73E56 100%);
 }
 
+/* ---------- Memory game ---------- */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.memory-card {
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: transform 0.15s, background 0.2s, color 0.2s;
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+}
+
+.memory-card:hover:not(.flipped):not(.matched) {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.memory-card.flipped,
+.memory-card.matched {
+  background: var(--honey-soft);
+  color: var(--text);
+  cursor: default;
+}
+
+.memory-card.matched {
+  background: linear-gradient(135deg, #FFE4A8 0%, #FFB627 100%);
+  box-shadow: 0 0 12px rgba(255, 182, 39, 0.5);
+}
+
+.memory-card.matched:hover {
+  transform: none;
+}
+
+[data-theme="dark"] .memory-card {
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+}
+
+[data-theme="dark"] .memory-card.flipped,
+[data-theme="dark"] .memory-card.matched {
+  background: var(--honey-soft);
+  color: var(--text);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   body {
