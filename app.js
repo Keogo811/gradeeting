@@ -30,6 +30,55 @@ function getVisitorId() {
 }
 const VISITOR_ID = getVisitorId();
 
+// ---------- Blagues du jour ----------
+const JOKES = [
+  "Why did the student eat his homework? Because the teacher said it was a piece of cake.",
+  "Why don't scientists trust atoms? Because they make up everything.",
+  "I told my computer I needed a break. It said: no problem, I'll go to sleep.",
+  "Why was the math book sad? Because it had too many problems.",
+  "I would tell you a joke about UDP, but you might not get it.",
+  "Why did the developer go broke? Because he used up all his cache.",
+  "There are 10 types of people in the world: those who understand binary, and those who don't.",
+  "Why do Java developers wear glasses? Because they don't C#.",
+  "I'm reading a book about anti-gravity. It's impossible to put down.",
+  "Why did the coffee file a police report? It got mugged.",
+  "I only know 25 letters of the alphabet. I don't know y.",
+  "Why don't eggs tell jokes? They'd crack each other up.",
+  "Why did the scarecrow win an award? Because he was outstanding in his field.",
+  "I'm on a seafood diet. I see food, and I eat it.",
+  "Why did the bicycle fall over? Because it was two-tired.",
+  "What do you call a fake noodle? An impasta.",
+  "I used to play piano by ear, but now I use my hands.",
+  "Why did the tomato turn red? Because it saw the salad dressing.",
+  "What do you call a bear with no teeth? A gummy bear.",
+  "Why don't skeletons fight each other? They don't have the guts.",
+  "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+  "Why did the gym close down? It just didn't work out.",
+  "Parallel lines have so much in common. It's a shame they'll never meet.",
+  "Why do we tell actors to 'break a leg'? Because every play has a cast.",
+  "I'm afraid for the calendar. Its days are numbered.",
+  "What do you call cheese that isn't yours? Nacho cheese.",
+  "I don't trust stairs. They're always up to something.",
+  "Why did the picture go to jail? Because it was framed.",
+  "What do you call a factory that makes okay products? A satisfactory.",
+  "I have a joke about time travel, but you didn't like it.",
+];
+
+// Hash déterministe d'une chaîne (pour un choix stable dans la journée)
+function dayHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 // Normalisation du champ classe
 function normalizeClass(input) {
   if (!input) return "";
@@ -92,6 +141,7 @@ async function loadVolunteers() {
 
   allVolunteers = shuffleArray(data);
   populateClassFilter(data);
+  renderFeatured(data);
   renderVolunteers(allVolunteers);
   updateStats(allVolunteers);
   loadCommentCount();
@@ -741,7 +791,7 @@ function setupShareButton(volunteer) {
   });
 }
 
-// 19. Ouvrir un profil via #volunteer=<id> dans l'URL
+// 18. Ouvrir un profil via #volunteer=<id> dans l'URL
 function handleHashOnLoad() {
   const hash = window.location.hash;
   const match = hash.match(/^#volunteer=([0-9a-f-]{36})$/i);
@@ -817,5 +867,37 @@ async function handleReaction(commentId, reaction, agreeBtn, disagreeBtn) {
   newSpan.textContent = parseInt(newSpan.textContent, 10) + 1;
 }
 
-// 20. Année dynamique dans le footer
+// 20. Star of the day
+function renderFeatured(volunteers) {
+  const section = document.getElementById("featured-section");
+
+  if (!volunteers || volunteers.length === 0) {
+    section.classList.add("hidden");
+    return;
+  }
+
+  // Tri stable par id pour que le choix soit identique pour tout le monde
+  const sorted = [...volunteers].sort((a, b) => a.id.localeCompare(b.id));
+  const seed = dayHash(getTodayKey());
+
+  const featured = sorted[seed % sorted.length];
+  const joke = JOKES[seed % JOKES.length];
+
+  const photo = document.getElementById("featured-photo");
+  photo.src = featured.photo_url || PLACEHOLDER;
+  photo.alt = featured.name;
+  photo.onerror = () => { photo.src = PLACEHOLDER; };
+
+  document.getElementById("featured-name").textContent = featured.name;
+  document.getElementById("featured-desc").textContent = featured.description || "";
+  document.getElementById("featured-joke").textContent = `😄 Joke of the day: ${joke}`;
+
+  section.classList.remove("hidden");
+
+  // Ouvrir le profil au clic
+  section.onclick = () => showVolunteerDetail(featured.id);
+  section.style.cursor = "pointer";
+}
+
+// 21. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
