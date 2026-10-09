@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page not found — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --border: #F3E1DA;
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .notfound-card {
+      background: var(--white);
+      padding: 3rem 2rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      border-top: 6px solid var(--honey);
+    }
+
+    .notfound-emoji {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+      display: block;
+      animation: sad-bounce 2.4s ease-in-out infinite;
+    }
+
+    @keyframes sad-bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-6px) rotate(-3deg); }
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .code {
+      display: inline-block;
+      background: var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+      letter-spacing: 0.06em;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+      font-size: 0.98rem;
+    }
+
+    .back-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+      color: white;
+      text-decoration: none;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.8rem 1.6rem;
+      border-radius: 999px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(199, 62, 86, 0.2);
+    }
+
+    .footer-note {
+      margin-top: 1.8rem;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="notfound-card">
+    <span class="notfound-emoji">🌸</span>
+    <span class="code">404</span>
+    <h1>Oops, nothing here</h1>
+    <p>Looks like this page wandered off the campus.<br>Let's get you back to the stars of Aivancity.</p>
+    <a href="/" class="back-btn">← Back to Gradeeting</a>
+    <div class="footer-note">GRADEETING — Aivancity student project</div>
+  </div>
+</body>
+</html>
