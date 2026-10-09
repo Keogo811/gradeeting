@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gradeeting</title>
+  <title>GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
-    <h1>Gradeeting</h1>
-    <p class="tagline">Discover the Aivancity community</p>
+    <h1>GRADEETING</h1>
+    <p class="tagline">✨ Discover the stars of Aivancity ✨</p>
   </header>
 
-  <!-- Barre de recherche et filtres -->
   <div class="filters">
     <input type="text" id="search-input" placeholder="Search by name...">
     <select id="class-filter">
@@ -21,24 +23,23 @@
     <button id="clear-filters" type="button">Clear</button>
   </div>
 
-  <!-- Liste des volontaires -->
   <div id="volunteers-list">
     <!-- Volunteer cards will appear here -->
   </div>
 
-  <!-- Détail d'un volontaire (caché au départ) -->
   <div id="volunteer-detail" style="display: none;">
     <button id="back-button">← Back to list</button>
     <div id="detail-content">
       <!-- Détail du volontaire et commentaires -->
     </div>
   </div>
-<div class="become-volunteer">
-  <button id="open-signup">Become a volunteer</button>
-</div>
-  <!-- À propos / Règles -->
+
+  <div class="become-volunteer">
+    <button id="open-signup">🌸 Become a volunteer</button>
+  </div>
+
   <section class="about-section">
-    <h2>About Gradeeting</h2>
+    <h2>🌸 About Gradeeting</h2>
     <p>
       Gradeeting is a voluntary platform made by and for Aivancity students.
       It helps you recognize faces on campus and start conversations more easily —
@@ -70,42 +71,42 @@
   </section>
 
   <footer class="site-footer">
-    <p>Gradeeting — Aivancity student project — <span id="year"></span></p>
+    <p>GRADEETING — Aivancity student project — <span id="year"></span></p>
   </footer>
-  
-<!-- Modal d'inscription -->
-<div id="signup-modal" class="modal hidden">
-  <div class="modal-content">
-    <button id="close-signup" class="modal-close">×</button>
-    <h2>Become a volunteer</h2>
-    <p class="modal-intro">
-      Fill this form to appear on Gradeeting. Your profile will be reviewed by the admin before appearing publicly.
-    </p>
 
-    <form id="signup-form">
-      <label>Your name *</label>
-      <input type="text" name="name" required maxlength="80" placeholder="First name + last initial or full name">
+  <!-- Modal d'inscription -->
+  <div id="signup-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-signup" class="modal-close">×</button>
+      <h2>Become a volunteer</h2>
+      <p class="modal-intro">
+        Fill this form to appear on Gradeeting. Your profile will be reviewed by the admin before appearing publicly.
+      </p>
 
-      <label>Your class *</label>
-      <input type="text" name="class" required maxlength="40" placeholder="e.g. PGE2 EN">
+      <form id="signup-form">
+        <label>Your name *</label>
+        <input type="text" name="name" required maxlength="80" placeholder="First name + last initial or full name">
 
-      <label>Short description *</label>
-      <textarea name="description" required maxlength="500" placeholder="A few words about you..."></textarea>
+        <label>Your class *</label>
+        <input type="text" name="class" required maxlength="40" placeholder="e.g. PGE2 EN">
 
-      <label>Your photo *</label>
-      <input type="file" name="photo" accept="image/*" required>
+        <label>Short description *</label>
+        <textarea name="description" required maxlength="500" placeholder="A few words about you..."></textarea>
 
-      <label class="consent-label">
-        <input type="checkbox" name="consent" required>
-        I agree that my name, class, photo and description appear publicly on Gradeeting.
-        I understand I can ask for removal at any time by contacting the admin.
-      </label>
+        <label>Your photo *</label>
+        <input type="file" name="photo" accept="image/*" required>
 
-      <button type="submit" id="signup-submit">Submit</button>
-      <div id="signup-message" class="form-message"></div>
-    </form>
+        <label class="consent-label">
+          <input type="checkbox" name="consent" required>
+          I agree that my name, class, photo and description appear publicly on Gradeeting.
+          I understand I can ask for removal at any time by contacting the admin.
+        </label>
+
+        <button type="submit" id="signup-submit">Submit</button>
+        <div id="signup-message" class="form-message"></div>
+      </form>
+    </div>
   </div>
-</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
