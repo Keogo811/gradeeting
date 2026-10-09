@@ -1566,6 +1566,15 @@ h1 {
   }
 }
 
+/* ---------- Compteur de visites ---------- */
+.visit-count {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 400;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   body {

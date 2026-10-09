@@ -1129,5 +1129,32 @@ function initAnnouncement() {
 
 initAnnouncement();
 
-// 24. Année dynamique dans le footer
+// 24. Compteur de visites anonyme
+async function initVisitCounter() {
+  const totalEl = document.getElementById("visit-total");
+  if (!totalEl) return;
+
+  // Enregistrer une nouvelle visite à chaque chargement
+  const { error: insertError } = await supabaseClient.from("visits").insert({});
+  if (insertError) {
+    console.error("Erreur visite :", insertError.message);
+  }
+
+  // Récupérer le total
+  const { count, error: countError } = await supabaseClient
+    .from("visits")
+    .select("*", { count: "exact", head: true });
+
+  if (countError) {
+    console.error("Erreur count visites :", countError.message);
+    totalEl.textContent = "—";
+    return;
+  }
+
+  totalEl.textContent = count;
+}
+
+initVisitCounter();
+
+// 25. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
