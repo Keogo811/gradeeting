@@ -18,6 +18,32 @@ let allVolunteers = [];
 
 const PLACEHOLDER = "https://placehold.co/300x180?text=No+Photo";
 
+// Normalisation du champ classe
+function normalizeClass(input) {
+  if (!input) return "";
+
+  let s = input.trim().toUpperCase();
+  s = s.replace(/\s+/g, " ");
+
+  // Teacher variants
+  if (/^(TEACHER|PROF|PROFESSOR|PROFESSEUR|PROFS)$/i.test(s)) {
+    return "Teacher";
+  }
+
+  // PGE pattern : PGE + chiffres + (optionnel) code langue
+  const pgeMatch = s.match(/^PGE\s*-?\s*(\d+)\s*-?\s*([A-Z]{2,3})?$/);
+  if (pgeMatch) {
+    const year = pgeMatch[1];
+    const lang = pgeMatch[2];
+    return lang ? `PGE${year} ${lang}` : `PGE${year}`;
+  }
+
+  // Master : placeholder, à affiner plus tard
+  // Pour l'instant on retourne la version uppercase + trim
+
+  return s;
+}
+
 // 2. Charger les volontaires approuvés
 async function loadVolunteers() {
   listContainer.innerHTML = '<p class="loading">Loading volunteers...</p>';
@@ -46,7 +72,7 @@ async function loadVolunteers() {
 
 // 3. Remplir le filtre de classes
 function populateClassFilter(volunteers) {
-  const classes = [...new Set(volunteers.map((v) => v.class).filter(Boolean))].sort();
+  const classes = [...new Set(volunteers.map((v) => normalizeClass(v.class)).filter(Boolean))].sort();
 
   classFilter.innerHTML = '<option value="">All classes</option>';
   classes.forEach((c) => {
@@ -89,10 +115,11 @@ function renderVolunteers(volunteers) {
     card.appendChild(name);
     card.appendChild(desc);
 
-    if (v.class) {
+    const normalizedClass = normalizeClass(v.class);
+    if (normalizedClass) {
       const classTag = document.createElement("span");
       classTag.className = "class-tag";
-      classTag.textContent = v.class;
+      classTag.textContent = normalizedClass;
       card.appendChild(classTag);
     }
 
@@ -107,7 +134,7 @@ function applyFilters() {
 
   const filtered = allVolunteers.filter((v) => {
     const matchName = v.name.toLowerCase().includes(search);
-    const matchClass = !selectedClass || v.class === selectedClass;
+    const matchClass = !selectedClass || normalizeClass(v.class) === selectedClass;
     return matchName && matchClass;
   });
 
@@ -161,7 +188,8 @@ async function showVolunteerDetail(volunteerId) {
   }
 
   const photo = volunteer.photo_url || PLACEHOLDER;
-  const classLine = volunteer.class ? `<p class="detail-class">${volunteer.class}</p>` : "";
+  const normalizedClass = normalizeClass(volunteer.class);
+  const classLine = normalizedClass ? `<p class="detail-class">${normalizedClass}</p>` : "";
 
   detailContent.innerHTML = `
     <div class="detail-header">
@@ -430,7 +458,7 @@ signupForm.addEventListener("submit", async (e) => {
   message.className = "form-message";
 
   const name = signupForm.name.value.trim();
-  const className = signupForm.class.value.trim();
+  const className = normalizeClass(signupForm.class.value);
   const description = signupForm.description.value.trim();
   const photoFile = signupForm.photo.files[0];
   const consent = signupForm.consent.checked;

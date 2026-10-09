@@ -19,6 +19,27 @@ const reportsListEl = document.getElementById("reports-list");
 
 const PLACEHOLDER = "https://placehold.co/200x200?text=No+Photo";
 
+// 2.5 Normalisation du champ classe
+function normalizeClass(input) {
+  if (!input) return "";
+
+  let s = input.trim().toUpperCase();
+  s = s.replace(/\s+/g, " ");
+
+  if (/^(TEACHER|PROF|PROFESSOR|PROFESSEUR|PROFS)$/i.test(s)) {
+    return "Teacher";
+  }
+
+  const pgeMatch = s.match(/^PGE\s*-?\s*(\d+)\s*-?\s*([A-Z]{2,3})?$/);
+  if (pgeMatch) {
+    const year = pgeMatch[1];
+    const lang = pgeMatch[2];
+    return lang ? `PGE${year} ${lang}` : `PGE${year}`;
+  }
+
+  return s;
+}
+
 // 3. Vérifier la session au chargement
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
@@ -198,7 +219,7 @@ async function loadPendingVolunteers() {
           <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
           <div>
             <div class="admin-card-title">${escapeHtml(v.name)}</div>
-            <div class="admin-card-meta">${escapeHtml(v.class || "No class")}</div>
+            <div class="admin-card-meta">${escapeHtml(normalizeClass(v.class) || "No class")}</div>
             <div class="admin-card-meta">Consent: ${v.consent_given ? "Yes" : "No"} ${v.consent_date ? `(${v.consent_date})` : ""}</div>
           </div>
         </div>
