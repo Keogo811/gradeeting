@@ -295,6 +295,12 @@ async function showVolunteerDetail(volunteerId) {
 
   listContainer.style.display = "none";
   detailContainer.style.display = "block";
+
+  // Redémarrer l'animation d'entrée à chaque ouverture
+  detailContainer.style.animation = "none";
+  void detailContainer.offsetWidth;
+  detailContainer.style.animation = "";
+
   detailContent.innerHTML = '<p class="loading">Loading profile...</p>';
 
   const { data: volunteer, error: volError } = await supabaseClient
@@ -565,6 +571,12 @@ function setupCommentForm() {
 function showList() {
   detailContainer.style.display = "none";
   listContainer.style.display = "grid";
+
+  // Redémarrer l'animation d'entrée de la liste
+  listContainer.style.animation = "none";
+  void listContainer.offsetWidth;
+  listContainer.style.animation = "";
+
   detailContent.innerHTML = "";
   currentVolunteerId = null;
   if (window.location.hash.startsWith("#volunteer=")) {
