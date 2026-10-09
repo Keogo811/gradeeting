@@ -1105,5 +1105,29 @@ function initMemoryGame() {
 
 initMemoryGame();
 
-// 23. Année dynamique dans le footer
+// 23. Bandeau d'annonce dismissible
+const ANNOUNCEMENT_VERSION = "v2"; // Change cette valeur pour réafficher le bandeau à tout le monde
+const ANNOUNCEMENT_KEY = "gradeeting_announcement_dismissed";
+
+function initAnnouncement() {
+  const banner = document.getElementById("announcement");
+  const closeBtn = document.getElementById("announcement-close");
+
+  if (!banner || !closeBtn) return;
+
+  const dismissed = localStorage.getItem(ANNOUNCEMENT_KEY);
+
+  if (dismissed !== ANNOUNCEMENT_VERSION) {
+    banner.classList.remove("hidden");
+  }
+
+  closeBtn.addEventListener("click", () => {
+    banner.classList.add("hidden");
+    localStorage.setItem(ANNOUNCEMENT_KEY, ANNOUNCEMENT_VERSION);
+  });
+}
+
+initAnnouncement();
+
+// 24. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
