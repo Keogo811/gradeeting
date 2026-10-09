@@ -17,6 +17,13 @@ const pendingCommentsEl = document.getElementById("pending-comments");
 const pendingVolunteersEl = document.getElementById("pending-volunteers");
 const reportsListEl = document.getElementById("reports-list");
 
+const statCommentsEl = document.getElementById("admin-stat-comments");
+const statVolunteersEl = document.getElementById("admin-stat-volunteers");
+const statReportsEl = document.getElementById("admin-stat-reports");
+const statCardComments = document.getElementById("stat-card-comments");
+const statCardVolunteers = document.getElementById("stat-card-volunteers");
+const statCardReports = document.getElementById("stat-card-reports");
+
 const PLACEHOLDER = "https://placehold.co/200x200?text=No+Photo";
 
 // 2.5 Normalisation du champ classe
@@ -70,6 +77,7 @@ function showAdminPanel(email) {
   adminPanel.classList.remove("hidden");
   adminEmail.textContent = email;
   loadAll();
+  loadStats();
 }
 
 function showLoginScreen() {
@@ -197,6 +205,7 @@ async function updateComment(commentId, newStatus) {
   }
 
   loadPendingComments();
+  loadStats();
 }
 
 // ---------- VOLONTAIRES EN ATTENTE ----------
@@ -284,6 +293,7 @@ async function updateVolunteer(volunteerId, newStatus) {
   }
 
   loadPendingVolunteers();
+  loadStats();
 }
 
 // ---------- SIGNALEMENTS ----------
@@ -363,6 +373,7 @@ async function updateReport(reportId, newStatus) {
   }
 
   loadReports();
+  loadStats();
 }
 
 // ---------- UTILITAIRE ----------
@@ -371,6 +382,37 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ---------- Compteurs dashboard ----------
+async function loadStats() {
+  const [commentsRes, volunteersRes, reportsRes] = await Promise.all([
+    supabaseClient
+      .from("comments")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending"),
+    supabaseClient
+      .from("volunteers")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending"),
+    supabaseClient
+      .from("reports")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending"),
+  ]);
+
+  updateStatCard(statCommentsEl, statCardComments, commentsRes.count ?? 0);
+  updateStatCard(statVolunteersEl, statCardVolunteers, volunteersRes.count ?? 0);
+  updateStatCard(statReportsEl, statCardReports, reportsRes.count ?? 0);
+}
+
+function updateStatCard(numberEl, cardEl, count) {
+  numberEl.textContent = count;
+  if (count > 0) {
+    cardEl.classList.add("has-items");
+  } else {
+    cardEl.classList.remove("has-items");
+  }
 }
 
 // 7. Lancer au chargement

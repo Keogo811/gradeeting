@@ -306,3 +306,47 @@ body {
 .login-form h1 {
   color: var(--rose-deep);
 }
+
+/* ---------- Stats dashboard ---------- */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.2rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  border-top: 4px solid var(--honey);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.has-items {
+  border-top-color: var(--rose-deep);
+  background: linear-gradient(180deg, #FFF5F7 0%, #FFFFFF 100%);
+}
+
+.stat-number {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--rose-deep);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
