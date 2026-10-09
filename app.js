@@ -522,5 +522,18 @@ backToTopBtn.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-// 16. Année dynamique dans le footer
+// 16. Navigation depuis le header
+const navAbout = document.getElementById("nav-about");
+const navVolunteer = document.getElementById("nav-volunteer");
+
+navAbout.addEventListener("click", () => {
+  document.querySelector(".about-section").scrollIntoView({ behavior: "smooth" });
+});
+
+navVolunteer.addEventListener("click", () => {
+  // Réutilise le bouton existant pour ouvrir le modal
+  document.getElementById("open-signup").click();
+});
+
+// 17. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

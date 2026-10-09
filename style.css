@@ -836,6 +836,35 @@ h1 {
   display: none;
 }
 
+/* ---------- Header nav ---------- */
+.header-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  background: var(--white);
+  border: 2px solid var(--rose-soft);
+  color: var(--rose-deep);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-link:hover {
+  background: var(--rose-soft);
+  border-color: var(--rose);
+  transform: translateY(-1px);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   body {
