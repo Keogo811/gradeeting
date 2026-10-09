@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradeeting — Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Écran de login (visible par défaut) -->
+  <div id="login-screen" class="login-screen">
+    <form id="login-form" class="login-form">
+      <h1>Gradeeting Admin</h1>
+      <p>Sign in to manage comments, volunteers and reports.</p>
+
+      <label>Email</label>
+      <input type="email" name="email" required autocomplete="email">
+
+      <label>Password</label>
+      <input type="password" name="password" required autocomplete="current-password">
+
+      <button type="submit" id="login-button">Sign in</button>
+      <div id="login-message" class="form-message"></div>
+    </form>
+  </div>
+
+  <!-- Panel admin (caché par défaut) -->
+  <div id="admin-panel" class="admin-panel hidden">
+    <header class="admin-header">
+      <h1>Gradeeting Admin</h1>
+      <div class="admin-header-right">
+        <span id="admin-email"></span>
+        <button id="logout-button">Log out</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <section class="admin-section">
+        <h2>Pending comments</h2>
+        <div id="pending-comments" class="admin-list">
+          <p class="loading">Loading...</p>
+        </div>
+      </section>
+
+      <section class="admin-section">
+        <h2>Pending volunteers</h2>
+        <div id="pending-volunteers" class="admin-list">
+          <p class="loading">Loading...</p>
+        </div>
+      </section>
+
+      <section class="admin-section">
+        <h2>Reports</h2>
+        <div id="reports-list" class="admin-list">
+          <p class="loading">Loading...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
