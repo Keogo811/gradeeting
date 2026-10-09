@@ -152,7 +152,7 @@ async function showVolunteerDetail(volunteerId) {
 
   const { data: comments, error: comError } = await supabaseClient
     .from("comments")
-    .select("body, sentiment, explanation, created_at")
+    .select("id, body, sentiment, explanation, created_at")
     .eq("volunteer_id", volunteerId)
     .eq("status", "approved")
     .order("created_at", { ascending: false });
@@ -237,6 +237,12 @@ async function showVolunteerDetail(volunteerId) {
       date.className = "date";
       date.textContent = new Date(c.created_at).toLocaleDateString();
       card.appendChild(date);
+
+      const reportBtn = document.createElement("button");
+      reportBtn.className = "report-button";
+      reportBtn.textContent = "Report";
+      reportBtn.addEventListener("click", () => openReportForm(c.id, card));
+      card.appendChild(reportBtn);
 
       commentsList.appendChild(card);
     });
@@ -330,5 +336,67 @@ clearFiltersBtn.addEventListener("click", clearFilters);
 // 11. Lancer au chargement
 loadVolunteers();
 
-// 12. Année dynamique dans le footer
+// 12. Ouvrir le formulaire de signalement
+function openReportForm(commentId, card) {
+  // Éviter les doublons
+  if (card.querySelector(".report-form")) return;
+
+  const form = document.createElement("div");
+  form.className = "report-form";
+  form.innerHTML = `
+    <label>Why are you reporting this comment?</label>
+    <textarea maxlength="500" placeholder="Explain briefly..."></textarea>
+    <div class="report-actions">
+      <button type="button" class="report-submit">Send report</button>
+      <button type="button" class="report-cancel">Cancel</button>
+    </div>
+    <div class="report-message"></div>
+  `;
+
+  const textarea = form.querySelector("textarea");
+  const submitBtn = form.querySelector(".report-submit");
+  const cancelBtn = form.querySelector(".report-cancel");
+  const message = form.querySelector(".report-message");
+
+  cancelBtn.addEventListener("click", () => form.remove());
+
+  submitBtn.addEventListener("click", async () => {
+    const reason = textarea.value.trim();
+
+    if (!reason) {
+      message.textContent = "Please explain your report.";
+      message.className = "report-message error";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+
+    const { error } = await supabaseClient.from("reports").insert({
+      comment_id: commentId,
+      reason: reason,
+      status: "pending",
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Send report";
+
+    if (error) {
+      console.error("Erreur signalement :", error.message);
+      message.textContent = "Something went wrong. Please try again.";
+      message.className = "report-message error";
+      return;
+    }
+
+    message.textContent = "Thank you. The admin will review this comment.";
+    message.className = "report-message success";
+    textarea.disabled = true;
+    submitBtn.style.display = "none";
+    cancelBtn.textContent = "Close";
+  });
+
+  card.appendChild(form);
+}
+
+// 13. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

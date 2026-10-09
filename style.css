@@ -406,3 +406,93 @@ p {
   font-size: 0.9rem;
   margin-bottom: 0.3rem;
 }
+
+/* Bouton Report */
+.report-button {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.report-button:hover {
+  color: #b42318;
+}
+
+/* Formulaire de signalement */
+.report-form {
+  margin-top: 0.8rem;
+  padding: 0.8rem;
+  background: #fafafa;
+  border-left: 3px solid #f0b400;
+  border-radius: 6px;
+}
+
+.report-form label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.report-form textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.report-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.report-submit {
+  background: #b42318;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.report-submit:hover {
+  background: #921910;
+}
+
+.report-cancel {
+  background: #eee;
+  color: #333;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.report-cancel:hover {
+  background: #ddd;
+}
+
+.report-message {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.report-message.error {
+  color: #b42318;
+}
+
+.report-message.success {
+  color: #1a7f37;
+}
