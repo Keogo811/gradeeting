@@ -224,9 +224,62 @@
       .kpi-value { font-size: 1.6rem; }
       .chart-container { height: 220px; }
     }
+
+    /* ---------- Pétales qui tombent ---------- */
+    .petals-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      top: -40px;
+      font-size: 1.1rem;
+      opacity: 0;
+      animation: petal-fall linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes petal-fall {
+      0% {
+        transform: translateY(-40px) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.55;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px) rotate(180deg);
+        opacity: 0.55;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(105vh) translateX(-15px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    [data-theme="dark"] .petal {
+      opacity: 0.35 !important;
+    }
   </style>
 </head>
 <body>
+  <!-- Pétales qui tombent en arrière-plan -->
+  <div class="petals-container" aria-hidden="true">
+    <span class="petal" style="left: 4%; animation-duration: 18s; animation-delay: 0s;">🌸</span>
+    <span class="petal" style="left: 22%; animation-duration: 20s; animation-delay: 8s;">🌷</span>
+    <span class="petal" style="left: 38%; animation-duration: 24s; animation-delay: 2s;">🌸</span>
+    <span class="petal" style="left: 52%; animation-duration: 19s; animation-delay: 11s;">🌺</span>
+    <span class="petal" style="left: 68%; animation-duration: 21s; animation-delay: 6s;">🌸</span>
+    <span class="petal" style="left: 88%; animation-duration: 17s; animation-delay: 9s;">🌸</span>
+    <span class="petal" style="left: 96%; animation-duration: 23s; animation-delay: 5s;">🌸</span>
+  </div>
   <div class="sun-rays" aria-hidden="true"></div>
 
   <div class="stats-page">

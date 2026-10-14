@@ -232,9 +232,62 @@
       .member-card { flex-direction: column; text-align: center; align-items: center; }
       .values-card { padding: 1.3rem; }
     }
+
+    /* ---------- Pétales qui tombent ---------- */
+    .petals-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      top: -40px;
+      font-size: 1.1rem;
+      opacity: 0;
+      animation: petal-fall linear infinite;
+      will-change: transform, opacity;
+    }
+
+    @keyframes petal-fall {
+      0% {
+        transform: translateY(-40px) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.55;
+      }
+      50% {
+        transform: translateY(50vh) translateX(20px) rotate(180deg);
+        opacity: 0.55;
+      }
+      90% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: translateY(105vh) translateX(-15px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    [data-theme="dark"] .petal {
+      opacity: 0.35 !important;
+    }
   </style>
 </head>
 <body>
+  <!-- Pétales qui tombent en arrière-plan -->
+  <div class="petals-container" aria-hidden="true">
+    <span class="petal" style="left: 4%; animation-duration: 18s; animation-delay: 0s;">🌸</span>
+    <span class="petal" style="left: 22%; animation-duration: 20s; animation-delay: 8s;">🌷</span>
+    <span class="petal" style="left: 38%; animation-duration: 24s; animation-delay: 2s;">🌸</span>
+    <span class="petal" style="left: 52%; animation-duration: 19s; animation-delay: 11s;">🌺</span>
+    <span class="petal" style="left: 68%; animation-duration: 21s; animation-delay: 6s;">🌸</span>
+    <span class="petal" style="left: 88%; animation-duration: 17s; animation-delay: 9s;">🌸</span>
+    <span class="petal" style="left: 96%; animation-duration: 23s; animation-delay: 5s;">🌸</span>
+  </div>
   <div class="sun-rays" aria-hidden="true"></div>
 
   <div class="page">
@@ -249,12 +302,12 @@
       <div class="member-card">
         <div class="member-avatar">👑</div>
         <div class="member-info">
-          <div class="member-name">Keogo</div>
-          <span class="member-role">Founder & Admin</span>
+          <div class="member-name">Keogo (Hugo K)</div>
+          <span class="member-role">Founder & Admin \ Future President of Cooking Club 😎</span>
           <p class="member-bio">
-            Designer and developer of Gradeeting. PGE2 EN student at Aivancity.
-            Built the whole platform solo, from idea to deployment. Handles moderation,
-            answers questions, and keeps the site alive.
+            Designer and Master Coder of Gradeeting. PGE2 EN student at Aivancity.
+            Built the whole platform, from idea to deployment. Handles moderation,
+            answers questions, and keeps the site alive. I definitely vibe coded the website.
           </p>
         </div>
       </div>
@@ -292,7 +345,7 @@
         <li><strong>Voluntary first.</strong> Nobody appears without agreeing to.</li>
         <li><strong>Kind honesty.</strong> Feedback should help, never hurt.</li>
         <li><strong>Anonymity protects.</strong> No accounts, no tracking, no pressure.</li>
-        <li><strong>Simple wins.</strong> Fewer features, better experience.</li>
+        <li><strong>Simple and Reliable before Complexity.</strong> Vibe coded but well-tested.</li>
         <li><strong>Community over code.</strong> The people matter more than the tech.</li>
       </ul>
     </div>
