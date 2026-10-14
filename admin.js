@@ -597,6 +597,7 @@ function openEditVolunteerModal(volunteer) {
     <div class="modal-actions">
       <button class="btn-save" id="edit-save">💾 Save</button>
       <button class="btn-cancel" id="edit-cancel">Cancel</button>
+      <button class="btn-danger" id="edit-delete">🗑️ Delete</button>
     </div>
     <div class="modal-message" id="edit-message"></div>
   `;
@@ -656,6 +657,7 @@ function openEditVolunteerModal(volunteer) {
 
   document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
   document.getElementById("edit-save").addEventListener("click", () => saveVolunteer(volunteer.id));
+  document.getElementById("edit-delete").addEventListener("click", () => deleteVolunteer(volunteer));
 }
 
 async function saveVolunteer(volunteerId) {
@@ -711,6 +713,95 @@ async function saveVolunteer(volunteerId) {
     loadPendingVolunteers();
     loadStats();
   }, 800);
+}
+
+// ---------- Suppression d'un volontaire ----------
+async function deleteVolunteer(volunteer) {
+  // Affiche un écran de confirmation dans le modal
+  editModalBody.innerHTML = `
+    <h2>⚠️ Delete volunteer</h2>
+    <p style="color: #b42318; font-weight: 600; margin: 1rem 0;">
+      You are about to permanently delete:
+    </p>
+    <p style="background: #fdecea; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-family: 'Fredoka', sans-serif;">
+      <strong>${escapeHtml(volunteer.name)}</strong><br>
+      <span style="font-size: 0.85rem; color: #666;">
+        ${escapeHtml(normalizeClass(volunteer.class) || "No class")}
+      </span>
+    </p>
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+      This will also delete all their comments, reactions and reports.<br>
+      This action is permanent and cannot be undone.
+    </p>
+
+    <label>Type <strong>DELETE</strong> (all caps) to confirm:</label>
+    <input type="text" id="delete-confirm-input" autocomplete="off" placeholder="DELETE">
+
+    <div class="modal-actions">
+      <button class="btn-danger" id="delete-confirm-btn" disabled>🗑️ Permanently delete</button>
+      <button class="btn-cancel" id="delete-cancel-btn">Cancel</button>
+    </div>
+    <div class="modal-message" id="delete-message"></div>
+  `;
+
+  const input = document.getElementById("delete-confirm-input");
+  const confirmBtn = document.getElementById("delete-confirm-btn");
+  const cancelBtn = document.getElementById("delete-cancel-btn");
+  const message = document.getElementById("delete-message");
+
+  // Activer le bouton seulement quand "DELETE" est tapé
+  input.addEventListener("input", () => {
+    confirmBtn.disabled = input.value.trim() !== "DELETE";
+  });
+
+  // Annuler
+  cancelBtn.addEventListener("click", () => {
+    // Revenir à l'édition
+    openEditVolunteerModal(volunteer);
+  });
+
+  // Confirmer la suppression
+  confirmBtn.addEventListener("click", async () => {
+    if (input.value.trim() !== "DELETE") return;
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Deleting...";
+    message.textContent = "";
+    message.className = "modal-message";
+
+    // 1. Supprimer la photo si elle vient de notre bucket
+    if (volunteer.photo_url && volunteer.photo_url.includes("/volunteer-photos/")) {
+      const fileName = volunteer.photo_url.split("/volunteer-photos/")[1];
+      if (fileName) {
+        await supabaseClient.storage.from("volunteer-photos").remove([fileName]);
+      }
+    }
+
+    // 2. Supprimer le volontaire (cascade supprime commentaires, réactions, signalements)
+    const { error } = await supabaseClient
+      .from("volunteers")
+      .delete()
+      .eq("id", volunteer.id);
+
+    if (error) {
+      console.error("Erreur suppression :", error.message);
+      message.textContent = "❌ Error deleting. Please try again.";
+      message.classList.add("error");
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = "🗑️ Permanently delete";
+      return;
+    }
+
+    message.textContent = "✅ Deleted.";
+    message.classList.add("success");
+
+    setTimeout(() => {
+      closeEditModal();
+      loadAllVolunteers();
+      loadPendingVolunteers();
+      loadStats();
+    }, 800);
+  });
 }
 
 // ---------- Onglet Comments (placeholder) ----------
