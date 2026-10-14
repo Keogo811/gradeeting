@@ -804,11 +804,258 @@ async function deleteVolunteer(volunteer) {
   });
 }
 
-// ---------- Onglet Comments (placeholder) ----------
-async function loadAllComments() {
-  document.getElementById("all-comments").innerHTML =
-    '<p class="empty-state">Coming soon...</p>';
+// ---------- Modal d'édition d'un commentaire ----------
+function openEditCommentModal(comment) {
+  const volunteerName = comment.volunteers ? comment.volunteers.name : "Unknown";
+
+  editModalBody.innerHTML = `
+    <h2>Edit comment</h2>
+
+    <p style="background: #FFF8F2; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-family: 'Fredoka', sans-serif; font-size: 0.9rem;">
+      About: <strong>${escapeHtml(volunteerName)}</strong>
+    </p>
+
+    <label>Comment body</label>
+    <textarea id="edit-comment-body" maxlength="1000">${escapeHtml(comment.body || "")}</textarea>
+
+    <label>Sentiment</label>
+    <select id="edit-comment-sentiment">
+      <option value="positive"${comment.sentiment === "positive" ? " selected" : ""}>Positive</option>
+      <option value="negative"${comment.sentiment === "negative" ? " selected" : ""}>Negative</option>
+    </select>
+
+    <label>Explanation (required for negative)</label>
+    <textarea id="edit-comment-explanation" maxlength="1000">${escapeHtml(comment.explanation || "")}</textarea>
+
+    <label>Status</label>
+    <select id="edit-comment-status">
+      <option value="approved"${comment.status === "approved" ? " selected" : ""}>Approved</option>
+      <option value="pending"${comment.status === "pending" ? " selected" : ""}>Pending</option>
+      <option value="rejected"${comment.status === "rejected" ? " selected" : ""}>Rejected</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="btn-save" id="edit-comment-save">💾 Save</button>
+      <button class="btn-cancel" id="edit-comment-cancel">Cancel</button>
+      <button class="btn-danger" id="edit-comment-delete">🗑️ Delete</button>
+    </div>
+    <div class="modal-message" id="edit-comment-message"></div>
+  `;
+
+  editModal.classList.remove("hidden");
+
+  document.getElementById("edit-comment-cancel").addEventListener("click", closeEditModal);
+  document.getElementById("edit-comment-save").addEventListener("click", () => saveComment(comment.id));
+  document.getElementById("edit-comment-delete").addEventListener("click", () => deleteComment(comment));
 }
+
+async function saveComment(commentId) {
+  const message = document.getElementById("edit-comment-message");
+  const saveBtn = document.getElementById("edit-comment-save");
+
+  message.textContent = "";
+  message.className = "modal-message";
+
+  const body = document.getElementById("edit-comment-body").value.trim();
+  const sentiment = document.getElementById("edit-comment-sentiment").value;
+  const explanation = document.getElementById("edit-comment-explanation").value.trim();
+  const status = document.getElementById("edit-comment-status").value;
+
+  if (!body) {
+    message.textContent = "Comment body is required.";
+    message.classList.add("error");
+    return;
+  }
+
+  if (sentiment === "negative" && !explanation) {
+    message.textContent = "Negative comments must include an explanation.";
+    message.classList.add("error");
+    return;
+  }
+
+  const updates = {
+    body: body,
+    sentiment: sentiment,
+    explanation: sentiment === "negative" ? explanation : null,
+    status: status,
+  };
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+
+  const { error } = await supabaseClient
+    .from("comments")
+    .update(updates)
+    .eq("id", commentId);
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = "💾 Save";
+
+  if (error) {
+    console.error("Erreur sauvegarde :", error.message);
+    message.textContent = "Error saving. Please try again.";
+    message.classList.add("error");
+    return;
+  }
+
+  message.textContent = "✅ Saved!";
+  message.classList.add("success");
+
+  setTimeout(() => {
+    closeEditModal();
+    loadAllComments();
+    loadPendingComments();
+    loadStats();
+  }, 800);
+}
+
+async function deleteComment(comment) {
+  editModalBody.innerHTML = `
+    <h2>⚠️ Delete comment</h2>
+    <p style="color: #b42318; font-weight: 600; margin: 1rem 0;">
+      You are about to permanently delete this comment:
+    </p>
+    <p style="background: #fdecea; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-style: italic;">
+      "${escapeHtml(comment.body)}"
+    </p>
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+      This will also delete all its reactions and reports.<br>
+      This action is permanent and cannot be undone.
+    </p>
+
+    <label>Type <strong>DELETE</strong> (all caps) to confirm:</label>
+    <input type="text" id="delete-comment-input" autocomplete="off" placeholder="DELETE">
+
+    <div class="modal-actions">
+      <button class="btn-danger" id="delete-comment-btn" disabled>🗑️ Permanently delete</button>
+      <button class="btn-cancel" id="delete-comment-cancel">Cancel</button>
+    </div>
+    <div class="modal-message" id="delete-comment-message"></div>
+  `;
+
+  const input = document.getElementById("delete-comment-input");
+  const confirmBtn = document.getElementById("delete-comment-btn");
+  const cancelBtn = document.getElementById("delete-comment-cancel");
+  const message = document.getElementById("delete-comment-message");
+
+  input.addEventListener("input", () => {
+    confirmBtn.disabled = input.value.trim() !== "DELETE";
+  });
+
+  cancelBtn.addEventListener("click", () => openEditCommentModal(comment));
+
+  confirmBtn.addEventListener("click", async () => {
+    if (input.value.trim() !== "DELETE") return;
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Deleting...";
+    message.textContent = "";
+    message.className = "modal-message";
+
+    const { error } = await supabaseClient
+      .from("comments")
+      .delete()
+      .eq("id", comment.id);
+
+    if (error) {
+      console.error("Erreur suppression :", error.message);
+      message.textContent = "❌ Error deleting. Please try again.";
+      message.classList.add("error");
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = "🗑️ Permanently delete";
+      return;
+    }
+
+    message.textContent = "✅ Deleted.";
+    message.classList.add("success");
+
+    setTimeout(() => {
+      closeEditModal();
+      loadAllComments();
+      loadPendingComments();
+      loadStats();
+    }, 800);
+  });
+}
+
+// ---------- Onglet Comments : tous les commentaires ----------
+let allCommentsCache = [];
+
+async function loadAllComments() {
+  const container = document.getElementById("all-comments");
+  container.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("comments")
+    .select("id, body, sentiment, explanation, status, created_at, volunteer_id, volunteers(name)")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement commentaires :", error.message);
+    container.innerHTML = '<p class="empty-state">Error loading comments.</p>';
+    return;
+  }
+
+  allCommentsCache = data;
+  renderAllComments();
+}
+
+function renderAllComments() {
+  const container = document.getElementById("all-comments");
+  const search = document.getElementById("comments-search").value.trim().toLowerCase();
+  const statusFilter = document.getElementById("comments-status-filter").value;
+
+  const filtered = allCommentsCache.filter((c) => {
+    const matchText = c.body.toLowerCase().includes(search);
+    const matchStatus = !statusFilter || c.status === statusFilter;
+    return matchText && matchStatus;
+  });
+
+  container.innerHTML = "";
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">No comments match your filters.</p>';
+    return;
+  }
+
+  filtered.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const volunteerName = c.volunteers ? c.volunteers.name : "Unknown";
+    const sentimentTag = `<span class="tag tag-${c.sentiment === "positive" ? "positive" : "negative"}">${c.sentiment}</span>`;
+    const statusTag = `<span class="tag tag-${c.status === "approved" ? "positive" : c.status === "rejected" ? "negative" : "pending"}">${c.status}</span>`;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div class="admin-card-title">About ${escapeHtml(volunteerName)} ${statusTag}</div>
+        <div class="admin-card-meta">${new Date(c.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        ${sentimentTag}
+        <p style="margin-top:0.5rem;">${escapeHtml(c.body)}</p>
+        ${c.explanation ? `<p style="margin-top:0.5rem;font-style:italic;color:#666;">Explanation: ${escapeHtml(c.explanation)}</p>` : ""}
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-neutral";
+    editBtn.textContent = "✏️ Edit";
+    editBtn.addEventListener("click", () => openEditCommentModal(c));
+
+    actions.appendChild(editBtn);
+    card.appendChild(actions);
+
+    container.appendChild(card);
+  });
+}
+
+// Brancher les filtres Comments
+document.getElementById("comments-search").addEventListener("input", renderAllComments);
+document.getElementById("comments-status-filter").addEventListener("change", renderAllComments);
 
 // ---------- Onglet Reports (placeholder) ----------
 async function loadAllReports() {
