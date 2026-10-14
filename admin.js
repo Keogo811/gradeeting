@@ -24,6 +24,10 @@ const statCardComments = document.getElementById("stat-card-comments");
 const statCardVolunteers = document.getElementById("stat-card-volunteers");
 const statCardReports = document.getElementById("stat-card-reports");
 
+const editModal = document.getElementById("edit-modal");
+const editModalBody = document.getElementById("edit-modal-body");
+const editModalClose = document.getElementById("edit-modal-close");
+
 const PLACEHOLDER = "https://placehold.co/200x200?text=No+Photo";
 
 // 2.5 Normalisation du champ classe
@@ -47,18 +51,21 @@ function normalizeClass(input) {
   return s;
 }
 
-// 2.6 Nettoyage des URLs externes
-function safeUrl(url) {
-  if (!url) return null;
-  if (!/^https?:\/\//i.test(url)) return null;
-  return url;
-}
-
+// 2.6 Utilitaires
 function escapeHtml(text) {
   if (!text) return "";
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+function escapeAttr(text) {
+  if (!text) return "";
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 // 3. Vérifier la session au chargement
@@ -377,14 +384,6 @@ async function updateReport(reportId, newStatus) {
   loadStats();
 }
 
-// ---------- UTILITAIRE ----------
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 // ---------- Compteurs dashboard ----------
 async function loadStats() {
   const [commentsRes, volunteersRes, reportsRes] = await Promise.all([
@@ -524,9 +523,7 @@ function renderAllVolunteers() {
     const editBtn = document.createElement("button");
     editBtn.className = "btn-neutral";
     editBtn.textContent = "✏️ Edit";
-    editBtn.addEventListener("click", () => {
-      alert("Edit will be available in the next step.");
-    });
+    editBtn.addEventListener("click", () => openEditVolunteerModal(v));
 
     actions.appendChild(editBtn);
     card.appendChild(actions);
@@ -535,19 +532,151 @@ function renderAllVolunteers() {
   });
 }
 
-// Brancher les filtres
-document.getElementById("volunteers-search").addEventListener("input", renderAllVolunteers);
-document.getElementById("volunteers-status-filter").addEventListener("change", renderAllVolunteers);
+// ---------- Modal d'édition d'un volontaire ----------
+editModalClose.addEventListener("click", closeEditModal);
+editModal.addEventListener("click", (e) => {
+  if (e.target === editModal) closeEditModal();
+});
 
+function closeEditModal() {
+  editModal.classList.add("hidden");
+  editModalBody.innerHTML = "";
+}
+
+function openEditVolunteerModal(volunteer) {
+  const photo = volunteer.photo_url || PLACEHOLDER;
+
+  editModalBody.innerHTML = `
+    <h2>Edit volunteer</h2>
+
+    <label>Name</label>
+    <input type="text" id="edit-name" maxlength="80" value="${escapeAttr(volunteer.name)}">
+
+    <label>Class</label>
+    <input type="text" id="edit-class" maxlength="40" value="${escapeAttr(volunteer.class || "")}">
+
+    <label>Pronouns</label>
+    <select id="edit-pronouns">
+      <option value="">—</option>
+      <option value="he"${volunteer.pronouns === "he" ? " selected" : ""}>he</option>
+      <option value="she"${volunteer.pronouns === "she" ? " selected" : ""}>she</option>
+      <option value="?"${volunteer.pronouns === "?" ? " selected" : ""}>?</option>
+    </select>
+
+    <label>Description</label>
+    <textarea id="edit-description" maxlength="500">${escapeHtml(volunteer.description || "")}</textarea>
+
+    <label>Photo URL</label>
+    <input type="text" id="edit-photo-url" value="${escapeAttr(volunteer.photo_url || "")}">
+    <img class="preview" id="edit-photo-preview" src="${photo}" alt="preview" onerror="this.src='${PLACEHOLDER}'">
+
+    <label>Instagram</label>
+    <input type="text" id="edit-instagram" maxlength="50" value="${escapeAttr(volunteer.instagram || "")}">
+
+    <label>Snapchat</label>
+    <input type="text" id="edit-snapchat" maxlength="50" value="${escapeAttr(volunteer.snapchat || "")}">
+
+    <label>LinkedIn URL</label>
+    <input type="url" id="edit-linkedin" maxlength="200" value="${escapeAttr(volunteer.linkedin || "")}">
+
+    <label>Contact email</label>
+    <input type="email" id="edit-contact-email" maxlength="100" value="${escapeAttr(volunteer.contact_email || "")}">
+
+    <label>Status</label>
+    <select id="edit-status">
+      <option value="approved"${volunteer.status === "approved" ? " selected" : ""}>Approved</option>
+      <option value="pending"${volunteer.status === "pending" ? " selected" : ""}>Pending</option>
+      <option value="rejected"${volunteer.status === "rejected" ? " selected" : ""}>Rejected</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="btn-save" id="edit-save">💾 Save</button>
+      <button class="btn-cancel" id="edit-cancel">Cancel</button>
+    </div>
+    <div class="modal-message" id="edit-message"></div>
+  `;
+
+  editModal.classList.remove("hidden");
+
+  document.getElementById("edit-photo-url").addEventListener("input", (e) => {
+    const preview = document.getElementById("edit-photo-preview");
+    preview.src = e.target.value || PLACEHOLDER;
+  });
+
+  document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
+  document.getElementById("edit-save").addEventListener("click", () => saveVolunteer(volunteer.id));
+}
+
+async function saveVolunteer(volunteerId) {
+  const message = document.getElementById("edit-message");
+  const saveBtn = document.getElementById("edit-save");
+
+  message.textContent = "";
+  message.className = "modal-message";
+
+  const updates = {
+    name: document.getElementById("edit-name").value.trim(),
+    class: normalizeClass(document.getElementById("edit-class").value),
+    pronouns: document.getElementById("edit-pronouns").value || null,
+    description: document.getElementById("edit-description").value.trim(),
+    photo_url: document.getElementById("edit-photo-url").value.trim() || null,
+    instagram: document.getElementById("edit-instagram").value.trim() || null,
+    snapchat: document.getElementById("edit-snapchat").value.trim() || null,
+    linkedin: document.getElementById("edit-linkedin").value.trim() || null,
+    contact_email: document.getElementById("edit-contact-email").value.trim() || null,
+    status: document.getElementById("edit-status").value,
+  };
+
+  if (!updates.name) {
+    message.textContent = "Name is required.";
+    message.classList.add("error");
+    return;
+  }
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+
+  const { error } = await supabaseClient
+    .from("volunteers")
+    .update(updates)
+    .eq("id", volunteerId);
+
+  saveBtn.disabled = false;
+  saveBtn.textContent = "💾 Save";
+
+  if (error) {
+    console.error("Erreur sauvegarde :", error.message);
+    message.textContent = "Error saving. Please try again.";
+    message.classList.add("error");
+    return;
+  }
+
+  message.textContent = "✅ Saved!";
+  message.classList.add("success");
+
+  setTimeout(() => {
+    closeEditModal();
+    loadAllVolunteers();
+    loadPendingVolunteers();
+    loadStats();
+  }, 800);
+}
+
+// ---------- Onglet Comments (placeholder) ----------
 async function loadAllComments() {
   document.getElementById("all-comments").innerHTML =
     '<p class="empty-state">Coming soon...</p>';
 }
 
+// ---------- Onglet Reports (placeholder) ----------
 async function loadAllReports() {
   document.getElementById("all-reports").innerHTML =
     '<p class="empty-state">Coming soon...</p>';
 }
+
+// ---------- Brancher les filtres Volunteers ----------
+document.getElementById("volunteers-search").addEventListener("input", renderAllVolunteers);
+document.getElementById("volunteers-status-filter").addEventListener("change", renderAllVolunteers);
 
 // 7. Lancer au chargement
 checkSession();
