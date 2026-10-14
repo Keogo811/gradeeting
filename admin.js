@@ -78,6 +78,7 @@ function showAdminPanel(email) {
   adminEmail.textContent = email;
   loadAll();
   loadStats();
+  setupTabs();
 }
 
 function showLoginScreen() {
@@ -413,6 +414,61 @@ function updateStatCard(numberEl, cardEl, count) {
   } else {
     cardEl.classList.remove("has-items");
   }
+}
+
+// ---------- Navigation par onglets ----------
+function setupTabs() {
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabPanels = document.querySelectorAll(".tab-panel");
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+
+      tabButtons.forEach((b) => b.classList.toggle("active", b === btn));
+      tabPanels.forEach((p) => p.classList.toggle("active", p.dataset.panel === target));
+
+      // Charger les données de l'onglet au premier clic
+      if (target === "volunteers" && !btn.dataset.loaded) {
+        loadAllVolunteers();
+        btn.dataset.loaded = "1";
+      }
+      if (target === "comments" && !btn.dataset.loaded) {
+        loadAllComments();
+        btn.dataset.loaded = "1";
+      }
+      if (target === "reports" && !btn.dataset.loaded) {
+        loadAllReports();
+        btn.dataset.loaded = "1";
+      }
+    });
+  });
+
+  // Compteurs cliquables : basculer sur l'onglet Pending
+  document.querySelectorAll(".stat-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const target = card.dataset.tab;
+      const btn = document.querySelector(`.tab-button[data-tab="${target}"]`);
+      if (btn) btn.click();
+    });
+    card.style.cursor = "pointer";
+  });
+}
+
+// ---------- Placeholders (remplis dans les prochaines étapes) ----------
+async function loadAllVolunteers() {
+  document.getElementById("all-volunteers").innerHTML =
+    '<p class="empty-state">Coming soon...</p>';
+}
+
+async function loadAllComments() {
+  document.getElementById("all-comments").innerHTML =
+    '<p class="empty-state">Coming soon...</p>';
+}
+
+async function loadAllReports() {
+  document.getElementById("all-reports").innerHTML =
+    '<p class="empty-state">Coming soon...</p>';
 }
 
 // 7. Lancer au chargement

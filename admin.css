@@ -380,3 +380,245 @@ body {
     display: none;
   }
 }
+
+/* ---------- Onglets admin ---------- */
+.admin-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  border-radius: 8px 8px 0 0;
+}
+
+.tab-button:hover {
+  color: var(--rose-deep);
+  background: var(--cream);
+}
+
+.tab-button.active {
+  color: var(--rose-deep);
+  border-bottom-color: var(--rose-deep);
+  font-weight: 600;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: tab-fade-in 0.25s ease;
+}
+
+@keyframes tab-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Filtres admin ---------- */
+.admin-filters {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-filters input,
+.admin-filters select {
+  padding: 0.55rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: white;
+  color: var(--text);
+}
+
+.admin-filters input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-filters input:focus,
+.admin-filters select:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-soft);
+}
+
+/* ---------- Modal d'édition ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(61, 44, 47, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-top: 6px solid var(--rose);
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #888;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--rose-deep);
+}
+
+.modal-content h2 {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  color: var(--rose-deep);
+  margin-bottom: 1rem;
+}
+
+.modal-content label {
+  display: block;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  margin-top: 0.8rem;
+  color: var(--text);
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content input[type="url"],
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #FFF8F2;
+  color: var(--text);
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-soft);
+  background: white;
+}
+
+.modal-content textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.modal-content img.preview {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 0.4rem;
+  border: 2px solid var(--border);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.modal-actions button {
+  border: none;
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.modal-actions .btn-save {
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+  color: white;
+}
+
+.modal-actions .btn-save:hover {
+  box-shadow: 0 4px 12px rgba(199, 62, 86, 0.3);
+}
+
+.modal-actions .btn-danger {
+  background: #b42318;
+  color: white;
+}
+
+.modal-actions .btn-danger:hover {
+  background: #921910;
+}
+
+.modal-actions .btn-cancel {
+  background: #eee;
+  color: #333;
+}
+
+.modal-actions .btn-cancel:hover {
+  background: #ddd;
+}
+
+.modal-message {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  font-family: 'Nunito', sans-serif;
+}
+
+.modal-message.error {
+  color: #b42318;
+}
+
+.modal-message.success {
+  color: #1a7f37;
+}
