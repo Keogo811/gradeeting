@@ -200,6 +200,31 @@
     </div>
   </div>
 
+  <!-- Floating suggestion button -->
+  <button id="suggest-fab" class="suggest-fab" aria-label="Suggest an idea" type="button">
+    💡
+  </button>
+
+  <!-- Suggestion modal -->
+  <div id="suggest-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="suggest-close" class="modal-close" aria-label="Close">×</button>
+      <h2>💡 Suggest an idea</h2>
+      <p class="modal-intro">
+        Have an idea to improve Gradeeting? Share it with the admin.
+        It can be a feature, a fix, a design idea — anything.
+      </p>
+
+      <form id="suggest-form">
+        <label>Your idea</label>
+        <textarea name="body" required maxlength="1000" placeholder="I think it would be great if..."></textarea>
+
+        <button type="submit" id="suggest-submit">Send suggestion</button>
+        <div id="suggest-message" class="form-message"></div>
+      </form>
+    </div>
+  </div>
+
   <audio id="bg-music" src="cancan.mp3" loop preload="none"></audio>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

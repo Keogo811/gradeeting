@@ -1208,5 +1208,69 @@ function initBackgroundMusic() {
 
 initBackgroundMusic();
 
-// 26. Année dynamique dans le footer
+// 26. Bouton de suggestion
+const suggestFab = document.getElementById("suggest-fab");
+const suggestModal = document.getElementById("suggest-modal");
+const suggestClose = document.getElementById("suggest-close");
+const suggestForm = document.getElementById("suggest-form");
+const suggestMessage = document.getElementById("suggest-message");
+const suggestSubmit = document.getElementById("suggest-submit");
+
+suggestFab.addEventListener("click", () => {
+  suggestModal.classList.remove("hidden");
+  suggestMessage.textContent = "";
+  suggestMessage.className = "form-message";
+});
+
+suggestClose.addEventListener("click", () => {
+  suggestModal.classList.add("hidden");
+});
+
+suggestModal.addEventListener("click", (e) => {
+  if (e.target === suggestModal) suggestModal.classList.add("hidden");
+});
+
+suggestForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  suggestMessage.textContent = "";
+  suggestMessage.className = "form-message";
+
+  const body = suggestForm.body.value.trim();
+
+  if (!body) {
+    suggestMessage.textContent = "Please write something.";
+    suggestMessage.classList.add("error");
+    return;
+  }
+
+  suggestSubmit.disabled = true;
+  suggestSubmit.textContent = "Sending...";
+
+  const { error } = await supabaseClient.from("suggestions").insert({
+    body: body,
+    status: "pending",
+  });
+
+  suggestSubmit.disabled = false;
+  suggestSubmit.textContent = "Send suggestion";
+
+  if (error) {
+    console.error("Erreur envoi suggestion :", error.message);
+    suggestMessage.textContent = "Something went wrong. Please try again.";
+    suggestMessage.classList.add("error");
+    return;
+  }
+
+  suggestForm.reset();
+  suggestMessage.textContent = "✅ Thank you! Your suggestion has been sent to the admin.";
+  suggestMessage.classList.add("success");
+
+  setTimeout(() => {
+    suggestModal.classList.add("hidden");
+    suggestMessage.textContent = "";
+  }, 2500);
+});
+
+// 27. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

@@ -63,6 +63,7 @@
         <button class="tab-button" data-tab="volunteers">Volunteers</button>
         <button class="tab-button" data-tab="comments">Comments</button>
         <button class="tab-button" data-tab="reports">Reports</button>
+        <button class="tab-button" data-tab="suggestions">Suggestions</button>
       </nav>
 
       <!-- Contenu des onglets -->
@@ -152,6 +153,27 @@
               </select>
             </div>
             <div id="all-reports" class="admin-list">
+              <p class="loading">Loading...</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- Onglet Suggestions -->
+        <div class="tab-panel" data-panel="suggestions">
+          <section class="admin-section">
+            <div class="admin-section-header">
+              <h2>Suggestions</h2>
+              <button class="btn-refresh" id="refresh-suggestions" type="button">↻ Refresh</button>
+            </div>
+            <div class="admin-filters">
+              <select id="suggestions-status-filter">
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+            <div id="all-suggestions" class="admin-list">
               <p class="loading">Loading...</p>
             </div>
           </section>

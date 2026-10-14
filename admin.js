@@ -442,6 +442,10 @@ function setupTabs() {
         loadAllReports();
         btn.dataset.loaded = "1";
       }
+      if (target === "suggestions" && !btn.dataset.loaded) {
+        loadAllSuggestions();
+        btn.dataset.loaded = "1";
+      }
     });
   });
 
@@ -1188,6 +1192,181 @@ document.getElementById("refresh-comments").addEventListener("click", () => {
 });
 document.getElementById("refresh-reports").addEventListener("click", () => {
   loadAllReports();
+});
+
+// ---------- Onglet Suggestions ----------
+let allSuggestionsCache = [];
+
+async function loadAllSuggestions() {
+  const container = document.getElementById("all-suggestions");
+  container.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("suggestions")
+    .select("id, body, status, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement suggestions :", error.message);
+    container.innerHTML = '<p class="empty-state">Error loading suggestions.</p>';
+    return;
+  }
+
+  allSuggestionsCache = data;
+  renderAllSuggestions();
+}
+
+function renderAllSuggestions() {
+  const container = document.getElementById("all-suggestions");
+  const statusFilter = document.getElementById("suggestions-status-filter").value;
+
+  const filtered = allSuggestionsCache.filter((s) => {
+    return !statusFilter || s.status === statusFilter;
+  });
+
+  container.innerHTML = "";
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">No suggestions match your filter.</p>';
+    return;
+  }
+
+  filtered.forEach((s) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const statusTag = `<span class="tag tag-${s.status === "reviewed" ? "positive" : s.status === "archived" ? "pending" : "negative"}">${s.status}</span>`;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div class="admin-card-title">Suggestion ${statusTag}</div>
+        <div class="admin-card-meta">${new Date(s.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        <p style="white-space: pre-wrap;">${escapeHtml(s.body)}</p>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    if (s.status === "pending") {
+      const reviewedBtn = document.createElement("button");
+      reviewedBtn.className = "btn-approve";
+      reviewedBtn.textContent = "✓ Mark as reviewed";
+      reviewedBtn.addEventListener("click", () => updateSuggestion(s.id, "reviewed"));
+      actions.appendChild(reviewedBtn);
+
+      const archiveBtn = document.createElement("button");
+      archiveBtn.className = "btn-neutral";
+      archiveBtn.textContent = "Archive";
+      archiveBtn.addEventListener("click", () => updateSuggestion(s.id, "archived"));
+      actions.appendChild(archiveBtn);
+    } else {
+      const resetBtn = document.createElement("button");
+      resetBtn.className = "btn-neutral";
+      resetBtn.textContent = "↺ Reset to pending";
+      resetBtn.addEventListener("click", () => updateSuggestion(s.id, "pending"));
+      actions.appendChild(resetBtn);
+    }
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn-reject";
+    deleteBtn.textContent = "🗑️ Delete";
+    deleteBtn.addEventListener("click", () => deleteSuggestion(s));
+    actions.appendChild(deleteBtn);
+
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
+async function updateSuggestion(id, newStatus) {
+  const { error } = await supabaseClient
+    .from("suggestions")
+    .update({ status: newStatus })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Erreur mise à jour suggestion :", error.message);
+    return;
+  }
+
+  loadAllSuggestions();
+}
+
+async function deleteSuggestion(suggestion) {
+  editModalBody.innerHTML = `
+    <h2>⚠️ Delete suggestion</h2>
+    <p style="color: #b42318; font-weight: 600; margin: 1rem 0;">
+      You are about to permanently delete this suggestion:
+    </p>
+    <p style="background: #fdecea; padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-style: italic; white-space: pre-wrap;">
+      "${escapeHtml(suggestion.body)}"
+    </p>
+    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+      This action is permanent.
+    </p>
+
+    <label>Type <strong>DELETE</strong> (all caps) to confirm:</label>
+    <input type="text" id="delete-suggestion-input" autocomplete="off" placeholder="DELETE">
+
+    <div class="modal-actions">
+      <button class="btn-danger" id="delete-suggestion-btn" disabled>🗑️ Permanently delete</button>
+      <button class="btn-cancel" id="delete-suggestion-cancel">Cancel</button>
+    </div>
+    <div class="modal-message" id="delete-suggestion-message"></div>
+  `;
+
+  editModal.classList.remove("hidden");
+
+  const input = document.getElementById("delete-suggestion-input");
+  const confirmBtn = document.getElementById("delete-suggestion-btn");
+  const cancelBtn = document.getElementById("delete-suggestion-cancel");
+  const message = document.getElementById("delete-suggestion-message");
+
+  input.addEventListener("input", () => {
+    confirmBtn.disabled = input.value.trim() !== "DELETE";
+  });
+
+  cancelBtn.addEventListener("click", closeEditModal);
+
+  confirmBtn.addEventListener("click", async () => {
+    if (input.value.trim() !== "DELETE") return;
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "Deleting...";
+
+    const { error } = await supabaseClient
+      .from("suggestions")
+      .delete()
+      .eq("id", suggestion.id);
+
+    if (error) {
+      console.error("Erreur suppression suggestion :", error.message);
+      message.textContent = "❌ Error deleting.";
+      message.classList.add("error");
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = "🗑️ Permanently delete";
+      return;
+    }
+
+    message.textContent = "✅ Deleted.";
+    message.classList.add("success");
+
+    setTimeout(() => {
+      closeEditModal();
+      loadAllSuggestions();
+    }, 800);
+  });
+}
+
+// Brancher le filtre Suggestions
+document.getElementById("suggestions-status-filter").addEventListener("change", renderAllSuggestions);
+
+// Bouton Refresh Suggestions
+document.getElementById("refresh-suggestions").addEventListener("click", () => {
+  loadAllSuggestions();
 });
 
 // 7. Lancer au chargement
