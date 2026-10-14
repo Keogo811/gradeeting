@@ -1179,5 +1179,16 @@ document.getElementById("reports-status-filter").addEventListener("change", rend
 document.getElementById("volunteers-search").addEventListener("input", renderAllVolunteers);
 document.getElementById("volunteers-status-filter").addEventListener("change", renderAllVolunteers);
 
+// ---------- Boutons Refresh ----------
+document.getElementById("refresh-volunteers").addEventListener("click", () => {
+  loadAllVolunteers();
+});
+document.getElementById("refresh-comments").addEventListener("click", () => {
+  loadAllComments();
+});
+document.getElementById("refresh-reports").addEventListener("click", () => {
+  loadAllReports();
+});
+
 // 7. Lancer au chargement
 checkSession();

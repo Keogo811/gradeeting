@@ -95,7 +95,10 @@
         <!-- Onglet Volunteers -->
         <div class="tab-panel" data-panel="volunteers">
           <section class="admin-section">
-            <h2>All volunteers</h2>
+            <div class="admin-section-header">
+              <h2>All volunteers</h2>
+              <button class="btn-refresh" id="refresh-volunteers" type="button">↻ Refresh</button>
+            </div>
             <div class="admin-filters">
               <input type="text" id="volunteers-search" placeholder="Search by name...">
               <select id="volunteers-status-filter">
@@ -114,7 +117,10 @@
         <!-- Onglet Comments -->
         <div class="tab-panel" data-panel="comments">
           <section class="admin-section">
-            <h2>All comments</h2>
+            <div class="admin-section-header">
+              <h2>All comments</h2>
+              <button class="btn-refresh" id="refresh-comments" type="button">↻ Refresh</button>
+            </div>
             <div class="admin-filters">
               <input type="text" id="comments-search" placeholder="Search by text...">
               <select id="comments-status-filter">
@@ -133,7 +139,10 @@
         <!-- Onglet Reports -->
         <div class="tab-panel" data-panel="reports">
           <section class="admin-section">
-            <h2>All reports</h2>
+            <div class="admin-section-header">
+              <h2>All reports</h2>
+              <button class="btn-refresh" id="refresh-reports" type="button">↻ Refresh</button>
+            </div>
             <div class="admin-filters">
               <select id="reports-status-filter">
                 <option value="">All statuses</option>
