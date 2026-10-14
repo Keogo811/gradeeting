@@ -455,11 +455,89 @@ function setupTabs() {
   });
 }
 
-// ---------- Placeholders (remplis dans les prochaines étapes) ----------
+// ---------- Onglet Volunteers : tous les volontaires ----------
+let allVolunteersCache = [];
+
 async function loadAllVolunteers() {
-  document.getElementById("all-volunteers").innerHTML =
-    '<p class="empty-state">Coming soon...</p>';
+  const container = document.getElementById("all-volunteers");
+  container.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("volunteers")
+    .select("id, name, class, description, photo_url, status, pronouns, instagram, snapchat, linkedin, contact_email, consent_given, consent_date, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement volontaires :", error.message);
+    container.innerHTML = '<p class="empty-state">Error loading volunteers.</p>';
+    return;
+  }
+
+  allVolunteersCache = data;
+  renderAllVolunteers();
 }
+
+function renderAllVolunteers() {
+  const container = document.getElementById("all-volunteers");
+  const search = document.getElementById("volunteers-search").value.trim().toLowerCase();
+  const statusFilter = document.getElementById("volunteers-status-filter").value;
+
+  const filtered = allVolunteersCache.filter((v) => {
+    const matchName = v.name.toLowerCase().includes(search);
+    const matchStatus = !statusFilter || v.status === statusFilter;
+    return matchName && matchStatus;
+  });
+
+  container.innerHTML = "";
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">No volunteers match your filters.</p>';
+    return;
+  }
+
+  filtered.forEach((v) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const photo = v.photo_url || PLACEHOLDER;
+    const statusTag = `<span class="tag tag-${v.status === "approved" ? "positive" : v.status === "rejected" ? "negative" : "pending"}">${v.status}</span>`;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div style="display:flex;gap:1rem;align-items:center;">
+          <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
+          <div>
+            <div class="admin-card-title">${escapeHtml(v.name)} ${statusTag}</div>
+            <div class="admin-card-meta">${escapeHtml(normalizeClass(v.class) || "No class")}</div>
+            <div class="admin-card-meta">Added: ${new Date(v.created_at).toLocaleDateString()}</div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-card-body">
+        <p>${escapeHtml(v.description || "")}</p>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-neutral";
+    editBtn.textContent = "✏️ Edit";
+    editBtn.addEventListener("click", () => {
+      alert("Edit will be available in the next step.");
+    });
+
+    actions.appendChild(editBtn);
+    card.appendChild(actions);
+
+    container.appendChild(card);
+  });
+}
+
+// Brancher les filtres
+document.getElementById("volunteers-search").addEventListener("input", renderAllVolunteers);
+document.getElementById("volunteers-status-filter").addEventListener("change", renderAllVolunteers);
 
 async function loadAllComments() {
   document.getElementById("all-comments").innerHTML =
