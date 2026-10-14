@@ -2007,6 +2007,54 @@ h1 {
   }
 }
 
+/* ---------- Rayons de soleil statiques (style soleil levant) ---------- */
+.sun-rays {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200vmax;
+  height: 200vmax;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 0%,
+    transparent 0deg,
+    rgba(255, 182, 39, 0.09) 3deg,
+    transparent 6deg,
+    transparent 10deg,
+    rgba(255, 182, 39, 0.06) 13deg,
+    transparent 16deg
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 60% 90% at 50% 0%,
+    black 0%,
+    rgba(0, 0, 0, 0.6) 35%,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    ellipse 60% 90% at 50% 0%,
+    black 0%,
+    rgba(0, 0, 0, 0.6) 35%,
+    transparent 75%
+  );
+  opacity: 0.85;
+}
+
+/* Version sombre : plus discrète et plus rosée */
+[data-theme="dark"] .sun-rays {
+  background: repeating-conic-gradient(
+    from 0deg at 50% 0%,
+    transparent 0deg,
+    rgba(232, 93, 117, 0.07) 3deg,
+    transparent 6deg,
+    transparent 10deg,
+    rgba(255, 182, 39, 0.05) 13deg,
+    transparent 16deg
+  );
+  opacity: 0.7;
+}
+
 /* ---------- Compteur de visites ---------- */
 .visit-count {
   margin-top: 0.3rem;
