@@ -13,10 +13,23 @@
   <div class="floral-band floral-band-left" aria-hidden="true"></div>
   <div class="floral-band floral-band-right" aria-hidden="true"></div>
 
+  <!-- Pétales qui tombent en arrière-plan -->
+  <div class="petals-container" aria-hidden="true">
+    <span class="petal" style="left: 4%; animation-duration: 18s; animation-delay: 0s;">🌸</span>
+    <span class="petal" style="left: 12%; animation-duration: 22s; animation-delay: 4s;">🌸</span>
+    <span class="petal" style="left: 22%; animation-duration: 20s; animation-delay: 8s;">🌷</span>
+    <span class="petal" style="left: 38%; animation-duration: 24s; animation-delay: 2s;">🌸</span>
+    <span class="petal" style="left: 52%; animation-duration: 19s; animation-delay: 11s;">🌺</span>
+    <span class="petal" style="left: 68%; animation-duration: 21s; animation-delay: 6s;">🌸</span>
+    <span class="petal" style="left: 78%; animation-duration: 25s; animation-delay: 1s;">🌷</span>
+    <span class="petal" style="left: 88%; animation-duration: 17s; animation-delay: 9s;">🌸</span>
+    <span class="petal" style="left: 96%; animation-duration: 23s; animation-delay: 5s;">🌸</span>
+  </div>
+
   <!-- Bandeau d'annonce -->
   <div id="announcement" class="announcement hidden">
     <span class="announcement-text">
-      🎉 Gradeeting v20 is live — reactions, dark mode, mini-games and more!
+      🎉 Gradeeting v21 is live — suggestion box, admin CRUD and more!
     </span>
     <button id="announcement-close" class="announcement-close" aria-label="Close" type="button">✕</button>
   </div>
@@ -74,8 +87,22 @@
     </div>
   </div>
 
+  <!-- Divider -->
+  <div class="section-divider" aria-hidden="true">
+    <span class="divider-line"></span>
+    <span class="divider-flower">🌸</span>
+    <span class="divider-line"></span>
+  </div>
+
   <div class="become-volunteer">
     <button id="open-signup">🌸 Become a volunteer</button>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider" aria-hidden="true">
+    <span class="divider-line"></span>
+    <span class="divider-flower">🐝</span>
+    <span class="divider-line"></span>
   </div>
 
   <!-- Take a break -->
@@ -111,6 +138,13 @@
     </div>
   </section>
 
+  <!-- Divider -->
+  <div class="section-divider" aria-hidden="true">
+    <span class="divider-line"></span>
+    <span class="divider-flower">💡</span>
+    <span class="divider-line"></span>
+  </div>
+
   <section class="about-section">
     <h2>🌸 About Gradeeting</h2>
     <p>
@@ -138,17 +172,23 @@
 
     <h3>Contact</h3>
     <p>
-      To become a volunteer, to request removal, or to report a comment, please do click on the corresponding buttons on the platform. If you have any other questions, you can
-      contact the admin directly at school(PGE2 EN).
+      To become a volunteer, to request removal, or to report a comment, please click on the
+      corresponding buttons on the platform. If you have any other questions, you can
+      contact the admin directly at school (PGE2 EN).
     </p>
   </section>
-  
+
   <button id="back-to-top" class="back-to-top hidden" aria-label="Back to top">↑</button>
 
   <footer class="site-footer">
-
-  <footer class="site-footer">
-    <p>GRADEETING — Aivancity student project — <span id="year"></span></p>
+    <div class="footer-brand">GRADEETING</div>
+    <p class="footer-tagline">✨ Discover the stars of Aivancity ✨</p>
+    <nav class="footer-links">
+      <button id="footer-about" class="footer-link" type="button">About</button>
+      <button id="footer-volunteer" class="footer-link" type="button">Become a volunteer</button>
+      <button id="footer-suggest" class="footer-link" type="button">Suggest an idea</button>
+    </nav>
+    <p class="footer-credits">Aivancity student project — <span id="year"></span></p>
     <p class="visit-count">👀 <span id="visit-total">—</span> visits so far</p>
   </footer>
 
@@ -226,7 +266,7 @@
   </div>
 
   <audio id="bg-music" src="cancan.mp3" loop preload="none"></audio>
-  
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>

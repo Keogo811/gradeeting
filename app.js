@@ -1272,5 +1272,28 @@ suggestForm.addEventListener("submit", async (e) => {
   }, 2500);
 });
 
-// 27. Année dynamique dans le footer
+// 28. Boutons du footer
+const footerAbout = document.getElementById("footer-about");
+const footerVolunteer = document.getElementById("footer-volunteer");
+const footerSuggest = document.getElementById("footer-suggest");
+
+if (footerAbout) {
+  footerAbout.addEventListener("click", () => {
+    document.querySelector(".about-section").scrollIntoView({ behavior: "smooth" });
+  });
+}
+
+if (footerVolunteer) {
+  footerVolunteer.addEventListener("click", () => {
+    document.getElementById("open-signup").click();
+  });
+}
+
+if (footerSuggest) {
+  footerSuggest.addEventListener("click", () => {
+    document.getElementById("suggest-fab").click();
+  });
+}
+
+// 28. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();

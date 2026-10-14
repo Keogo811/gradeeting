@@ -1641,6 +1641,372 @@ h1 {
   }
 }
 
+/* =====================================================
+   SPRINT 23 — POLISH ESTHÉTIQUE
+   ===================================================== */
+
+/* ---------- Pétales qui tombent ---------- */
+.petals-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -40px;
+  font-size: 1.1rem;
+  opacity: 0;
+  animation: petal-fall linear infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translateY(-40px) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(50vh) translateX(20px) rotate(180deg);
+    opacity: 0.55;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(105vh) translateX(-15px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+[data-theme="dark"] .petal {
+  opacity: 0.35 !important;
+}
+
+/* ---------- Divider entre sections ---------- */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  max-width: 500px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--rose-soft) 50%, transparent 100%);
+  border-radius: 2px;
+}
+
+.divider-flower {
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(199, 62, 86, 0.15));
+  animation: divider-bounce 3s ease-in-out infinite;
+}
+
+@keyframes divider-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-3px) rotate(6deg); }
+}
+
+[data-theme="dark"] .divider-flower {
+  filter: drop-shadow(0 2px 6px rgba(232, 93, 117, 0.35));
+}
+
+/* ---------- Sparkle sur le badge Featured ---------- */
+.featured-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  animation: badge-shine 3.5s ease-in-out infinite;
+}
+
+@keyframes badge-shine {
+  0%   { left: -100%; }
+  50%  { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* ---------- Empty states améliorés ---------- */
+.empty,
+.loading {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: var(--white);
+  border: 2px dashed var(--rose-soft);
+  border-radius: var(--radius);
+  max-width: 500px;
+  margin: 1.5rem auto;
+  font-style: normal;
+  position: relative;
+}
+
+.empty::before {
+  content: '🌸';
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.6rem;
+  opacity: 0.7;
+}
+
+.loading::before {
+  content: '⏳';
+  display: block;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+  animation: loading-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.15); opacity: 1; }
+}
+
+[data-theme="dark"] .empty,
+[data-theme="dark"] .loading {
+  background: var(--cream-deep);
+  border-color: var(--rose-soft);
+}
+
+/* ---------- Footer enrichi ---------- */
+.site-footer {
+  max-width: 700px;
+  margin: 3rem auto 0 auto;
+  text-align: center;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border-top: 2px solid var(--border);
+  position: relative;
+}
+
+.site-footer::before {
+  content: '🌸';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cream);
+  padding: 0 0.6rem;
+  font-size: 1rem;
+}
+
+.footer-brand {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--rose-deep);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+
+.footer-tagline {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.footer-link {
+  background: none;
+  border: none;
+  color: var(--rose-deep);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.footer-link:hover {
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+}
+
+.footer-credits {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+
+.visit-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 400;
+  margin-top: 0.3rem;
+}
+
+/* ---------- Micro-interactions sur les boutons ---------- */
+.nav-link:active,
+.filters button:active,
+.game-btn:active,
+.become-volunteer button:active,
+.comment-form button:active,
+.share-button:active,
+.social-link:active,
+.modal-actions button:active,
+.report-submit:active,
+.report-cancel:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Amélioration des cartes volontaires ---------- */
+.volunteer-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.volunteer-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 182, 39, 0.08) 100%);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  border-radius: var(--radius-lg);
+}
+
+.volunteer-card:hover::before {
+  opacity: 1;
+}
+
+/* ---------- Amélioration du detail-header ---------- */
+.detail-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--rose) 0%, var(--honey) 50%, var(--rose) 100%);
+  opacity: 0.7;
+}
+
+/* ---------- Amélioration typographique ---------- */
+.about-section p,
+.comment-card p,
+.featured-info p {
+  line-height: 1.65;
+}
+
+.about-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ---------- Détail : commentaire négatif plus visible ---------- */
+.comment-card:has(.sentiment.negative) {
+  border-left-color: var(--rose);
+}
+
+.comment-card:has(.sentiment.positive) {
+  border-left-color: #A8C99A;
+}
+
+/* ---------- Hover sur les réactions ---------- */
+.reaction-btn:active {
+  transform: scale(0.94);
+}
+
+/* ---------- Amélioration du bandeau d'annonce ---------- */
+.announcement {
+  position: relative;
+  overflow: hidden;
+}
+
+.announcement::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: announcement-shine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes announcement-shine {
+  0%   { left: -100%; }
+  60%  { left: 100%; }
+  100% { left: 100%; }
+}
+
+/* ---------- Responsive ajustements pour les nouveautés ---------- */
+@media (max-width: 600px) {
+  .section-divider {
+    margin: 1.8rem auto;
+    gap: 0.5rem;
+  }
+
+  .divider-flower {
+    font-size: 1.1rem;
+  }
+
+  .site-footer::before {
+    font-size: 0.9rem;
+  }
+
+  .footer-brand {
+    font-size: 1.1rem;
+  }
+
+  .petal {
+    font-size: 0.9rem;
+  }
+}
+
 /* ---------- Compteur de visites ---------- */
 .visit-count {
   margin-top: 0.3rem;
