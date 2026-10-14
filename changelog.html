@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --border: #F3E1DA;
+      --shadow-sm: 0 2px 8px rgba(199, 62, 86, 0.06);
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    [data-theme="dark"] {
+      --cream: #1E1819;
+      --cream-deep: #2A2123;
+      --white: #2E2527;
+      --rose: #F07C90;
+      --rose-deep: #E85D75;
+      --rose-soft: #4A2C33;
+      --honey: #FFB627;
+      --honey-soft: #4A3A1E;
+      --text: #F5EBE8;
+      --text-muted: #B8A2A5;
+      --border: #3E2F32;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 1.5rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .sun-rays {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200vmax;
+      height: 200vmax;
+      pointer-events: none;
+      z-index: 0;
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(255, 182, 39, 0.09) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.06) 13deg, transparent 16deg);
+      -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      opacity: 0.85;
+    }
+
+    [data-theme="dark"] .sun-rays {
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(232, 93, 117, 0.07) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.05) 13deg, transparent 16deg);
+      opacity: 0.7;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--white);
+      border: 2px solid var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s;
+    }
+
+    .back-home:hover {
+      background: var(--rose-soft);
+      transform: translateX(-2px);
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--rose) 0%, var(--honey) 100%);
+      border-radius: 2px;
+    }
+
+    .release {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .release::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 1.2rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 3px solid var(--rose-deep);
+      box-shadow: 0 0 0 3px var(--rose-soft);
+    }
+
+    .release-body {
+      background: var(--white);
+      padding: 1.2rem 1.3rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--honey);
+    }
+
+    .release-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .release-version {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--rose-deep);
+    }
+
+    .release-date {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .release-tag {
+      display: inline-block;
+      background: var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      margin-left: 0.5rem;
+    }
+
+    .release ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .release ul li {
+      font-size: 0.9rem;
+      color: var(--text);
+      padding-left: 1.4rem;
+      position: relative;
+      margin-bottom: 0.4rem;
+      line-height: 1.55;
+    }
+
+    .release ul li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--honey);
+      font-weight: 700;
+    }
+
+    @media (max-width: 600px) {
+      .page-header h1 { font-size: 1.7rem; }
+      .timeline { padding-left: 1.5rem; }
+      .release::before { left: -1.5rem; }
+      .release-body { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sun-rays" aria-hidden="true"></div>
+
+  <div class="page">
+    <div class="page-header">
+      <a href="index.html" class="back-home">← Back to Gradeeting</a>
+      <h1>📝 Changelog</h1>
+      <p>Every improvement, big and small</p>
+    </div>
+
+    <div class="timeline">
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v25 <span class="release-tag">Latest</span></div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Public stats page with charts</li>
+            <li>About section redesigned with cards</li>
+            <li>FAQ, Changelog, Team pages</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v22</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Suggestion box (floating 💡 button)</li>
+            <li>Admin can edit and delete any volunteer, comment or report</li>
+            <li>Refresh buttons in the admin panel</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v20</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Anonymous reactions (👍 👎) on comments</li>
+            <li>Star of the day + Joke of the day</li>
+            <li>Dark mode toggle</li>
+            <li>Admin dashboard with counters</li>
+            <li>Floral side decorations</li>
+            <li>Two mini-games: Grow a Flower and Flower Memory</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v14</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Public stats bar (volunteers, comments, teachers)</li>
+            <li>Share button on each profile</li>
+            <li>Direct profile links via URL hash</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v13</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Pronouns (he / she / ?) and optional social links</li>
+            <li>Class auto-normalization (PGE2EN → PGE2 EN)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v10</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Volunteer self-signup form</li>
+            <li>Admin approval queue</li>
+            <li>QR code page for campus promotion</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v5</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>Live site deployed on Netlify</li>
+            <li>Auto-deploy from GitHub</li>
+            <li>Custom 404 page</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="release">
+        <div class="release-body">
+          <div class="release-header">
+            <div class="release-version">v1 🎉</div>
+            <div class="release-date">October 2026</div>
+          </div>
+          <ul>
+            <li>First version: volunteer list, detail page and anonymous comments</li>
+            <li>Admin moderation via Supabase dashboard</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const THEME_KEY = "gradeeting_theme";
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else if (!savedTheme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</body>
+</html> 

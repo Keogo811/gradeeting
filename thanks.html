@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank you — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --cream: #1E1819;
+      --cream-deep: #2A2123;
+      --white: #2E2527;
+      --rose: #F07C90;
+      --rose-deep: #E85D75;
+      --rose-soft: #4A2C33;
+      --honey: #FFB627;
+      --honey-soft: #4A3A1E;
+      --text: #F5EBE8;
+      --text-muted: #B8A2A5;
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .thanks-card {
+      background: var(--white);
+      padding: 3rem 2rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      border-top: 6px solid var(--honey);
+      animation: card-in 0.5s ease;
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .thanks-emoji {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+      display: block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-8px) rotate(-4deg); }
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.6rem;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      margin-bottom: 1.5rem;
+    }
+
+    p strong { color: var(--rose-deep); }
+
+    .back-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);
+      color: white;
+      text-decoration: none;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.8rem 1.6rem;
+      border-radius: 999px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(199, 62, 86, 0.2);
+    }
+
+    .footer-note {
+      margin-top: 1.8rem;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="thanks-card">
+    <span class="thanks-emoji">🌸</span>
+    <h1 id="thanks-title">Thank you!</h1>
+    <p id="thanks-message">
+      Your submission has been received.<br>
+      It will be reviewed by the admin and appear shortly.
+    </p>
+    <a href="index.html" class="back-btn">← Back to Gradeeting</a>
+    <div class="footer-note">GRADEETING — Aivancity student project</div>
+  </div>
+
+  <script>
+    const THEME_KEY = "gradeeting_theme";
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else if (!savedTheme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
+    // Adapter le message selon le paramètre d'URL ?from=
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
+
+    const title = document.getElementById("thanks-title");
+    const message = document.getElementById("thanks-message");
+
+    if (from === "volunteer") {
+      title.textContent = "Welcome aboard! 🌸";
+      message.innerHTML = "Your volunteer profile has been submitted.<br>The admin will review it and approve it soon.";
+    } else if (from === "suggestion") {
+      title.textContent = "Idea received! 💡";
+      message.innerHTML = "Thank you for helping improve Gradeeting.<br>Your suggestion has been sent to the admin.";
+    } else if (from === "comment") {
+      title.textContent = "Comment sent! 💬";
+      message.innerHTML = "Your comment is now pending review.<br>It will appear after moderation.";
+    }
+  </script>
+</body>
+</html>

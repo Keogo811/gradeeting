@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --border: #F3E1DA;
+      --shadow-sm: 0 2px 8px rgba(199, 62, 86, 0.06);
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    [data-theme="dark"] {
+      --cream: #1E1819;
+      --cream-deep: #2A2123;
+      --white: #2E2527;
+      --rose: #F07C90;
+      --rose-deep: #E85D75;
+      --rose-soft: #4A2C33;
+      --honey: #FFB627;
+      --honey-soft: #4A3A1E;
+      --text: #F5EBE8;
+      --text-muted: #B8A2A5;
+      --border: #3E2F32;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 1.5rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .sun-rays {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200vmax;
+      height: 200vmax;
+      pointer-events: none;
+      z-index: 0;
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(255, 182, 39, 0.09) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.06) 13deg, transparent 16deg);
+      -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      opacity: 0.85;
+    }
+
+    [data-theme="dark"] .sun-rays {
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(232, 93, 117, 0.07) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.05) 13deg, transparent 16deg);
+      opacity: 0.7;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--white);
+      border: 2px solid var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s;
+    }
+
+    .back-home:hover {
+      background: var(--rose-soft);
+      transform: translateX(-2px);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .faq-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border-left: 5px solid var(--honey);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .faq-item:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .faq-item[open] {
+      border-left-color: var(--rose-deep);
+    }
+
+    .faq-question {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      padding: 1.1rem 1.3rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      user-select: none;
+    }
+
+    .faq-question::-webkit-details-marker { display: none; }
+
+    .faq-question::after {
+      content: '▾';
+      color: var(--rose-deep);
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .faq-item[open] .faq-question::after {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      padding: 0 1.3rem 1.1rem 1.3rem;
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    .faq-answer p { margin-bottom: 0.6rem; }
+    .faq-answer p:last-child { margin-bottom: 0; }
+    .faq-answer strong { color: var(--rose-deep); font-weight: 700; }
+    .faq-answer a { color: var(--rose-deep); font-weight: 600; }
+
+    .faq-contact {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--honey-soft) 0%, #FFE4A8 100%);
+      border-radius: var(--radius);
+      border-left: 5px solid var(--honey);
+      text-align: center;
+    }
+
+    .faq-contact strong { color: #4a2c00; display: block; margin-bottom: 0.4rem; }
+    .faq-contact p { color: #4a2c00; font-size: 0.9rem; }
+
+    [data-theme="dark"] .faq-contact {
+      background: linear-gradient(135deg, #4A3A1E 0%, #3A2E18 100%);
+      border-left-color: var(--honey);
+    }
+    [data-theme="dark"] .faq-contact strong,
+    [data-theme="dark"] .faq-contact p { color: #F5EBE8; }
+
+    @media (max-width: 600px) {
+      .page-header h1 { font-size: 1.7rem; }
+      .faq-question { font-size: 0.95rem; padding: 1rem; }
+      .faq-answer { padding: 0 1rem 1rem 1rem; font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sun-rays" aria-hidden="true"></div>
+
+  <div class="page">
+    <div class="page-header">
+      <a href="index.html" class="back-home">← Back to Gradeeting</a>
+      <h1>❓ FAQ</h1>
+      <p>Everything you need to know about Gradeeting</p>
+    </div>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary class="faq-question">What is Gradeeting?</summary>
+        <div class="faq-answer">
+          <p>Gradeeting is a <strong>voluntary platform</strong> made by and for Aivancity students. It helps you recognize faces on campus and start conversations more easily — especially if you are shy or new.</p>
+          <p>Volunteers appear with a photo and a short description. Visitors can read anonymous, moderated comments about them.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Who appears on Gradeeting?</summary>
+        <div class="faq-answer">
+          <p>Only people who <strong>agreed to be shown</strong>. Being on Gradeeting is 100% voluntary. Nobody is added without their consent.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">How do I become a volunteer?</summary>
+        <div class="faq-answer">
+          <p>Click the <strong>Become a volunteer</strong> button. Fill the form with your name, class, a short description, a photo, and your consent. Your profile will be reviewed by the admin before appearing publicly.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Can I remove my profile later?</summary>
+        <div class="faq-answer">
+          <p>Yes. At any time, you can contact the admin directly at school <strong>(PGE2 EN)</strong> and ask for removal. Your profile and comments will be deleted as soon as possible.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Are comments really anonymous?</summary>
+        <div class="faq-answer">
+          <p>Yes. Comments are anonymous. <strong>No account is needed</strong> to write one. No personal data is collected from visitors, and no cookies or tracking are used.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Why do some comments not appear?</summary>
+        <div class="faq-answer">
+          <p>Every comment is <strong>moderated before appearing</strong>. Negative comments must include a constructive explanation, or they are rejected. This keeps the platform kind and useful.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">How long does moderation take?</summary>
+        <div class="faq-answer">
+          <p>Usually between 24 and 48 hours. Moderation is done by the admin.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Can I report a comment?</summary>
+        <div class="faq-answer">
+          <p>Yes. Under every comment, click <strong>Report</strong> and explain why. The admin will review it.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">What do the 👍 and 👎 reactions mean?</summary>
+        <div class="faq-answer">
+          <p>They let you say whether you <strong>agree or disagree</strong> with a comment. You can react once per comment, and change your mind later.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Why no user accounts?</summary>
+        <div class="faq-answer">
+          <p>To lower the barrier. Anyone can browse and comment without signing up. Anonymity helps shy students participate too.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">Who is behind Gradeeting?</summary>
+        <div class="faq-answer">
+          <p>It is a <strong>student project</strong>. See the <a href="team.html">Team page</a> for more details.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-question">I have an idea to improve Gradeeting. Where can I send it?</summary>
+        <div class="faq-answer">
+          <p>Click the <strong>💡 lightbulb</strong> button in the bottom-right corner of any page. It opens a suggestion form that goes directly to the admin.</p>
+        </div>
+      </details>
+
+    </div>
+
+    <div class="faq-contact">
+      <strong>Still have a question?</strong>
+      <p>Contact the admin directly at school — PGE2 EN.</p>
+    </div>
+  </div>
+
+  <script>
+    const THEME_KEY = "gradeeting_theme";
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else if (!savedTheme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --border: #F3E1DA;
+      --shadow-sm: 0 2px 8px rgba(199, 62, 86, 0.06);
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    [data-theme="dark"] {
+      --cream: #1E1819;
+      --cream-deep: #2A2123;
+      --white: #2E2527;
+      --rose: #F07C90;
+      --rose-deep: #E85D75;
+      --rose-soft: #4A2C33;
+      --honey: #FFB627;
+      --honey-soft: #4A3A1E;
+      --text: #F5EBE8;
+      --text-muted: #B8A2A5;
+      --border: #3E2F32;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 1.5rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .sun-rays {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200vmax;
+      height: 200vmax;
+      pointer-events: none;
+      z-index: 0;
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(255, 182, 39, 0.09) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.06) 13deg, transparent 16deg);
+      -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      opacity: 0.85;
+    }
+
+    [data-theme="dark"] .sun-rays {
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(232, 93, 117, 0.07) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.05) 13deg, transparent 16deg);
+      opacity: 0.7;
+    }
+
+    .page {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--white);
+      border: 2px solid var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s;
+    }
+
+    .back-home:hover {
+      background: var(--rose-soft);
+      transform: translateX(-2px);
+    }
+
+    .team-grid {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .member-card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border-left: 5px solid var(--rose);
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+    }
+
+    .member-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--honey-soft) 0%, var(--rose-soft) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(199, 62, 86, 0.15);
+    }
+
+    .member-info { flex: 1; min-width: 0; }
+
+    .member-name {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--rose-deep);
+      margin-bottom: 0.2rem;
+    }
+
+    .member-role {
+      display: inline-block;
+      background: var(--honey-soft);
+      color: #8a5b00;
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.6rem;
+    }
+
+    .member-bio {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .values-card {
+      margin-top: 2rem;
+      background: var(--white);
+      padding: 1.8rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border-top: 6px solid var(--honey);
+    }
+
+    .values-card h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--rose-deep);
+      margin-bottom: 1rem;
+    }
+
+    .values-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .values-list li {
+      font-size: 0.92rem;
+      color: var(--text);
+      padding-left: 1.6rem;
+      position: relative;
+      margin-bottom: 0.7rem;
+      line-height: 1.6;
+    }
+
+    .values-list li::before {
+      content: '🌸';
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .values-list li strong {
+      color: var(--rose-deep);
+      font-weight: 700;
+    }
+
+    @media (max-width: 500px) {
+      .page-header h1 { font-size: 1.7rem; }
+      .member-card { flex-direction: column; text-align: center; align-items: center; }
+      .values-card { padding: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sun-rays" aria-hidden="true"></div>
+
+  <div class="page">
+    <div class="page-header">
+      <a href="index.html" class="back-home">← Back to Gradeeting</a>
+      <h1>🌸 The Team</h1>
+      <p>Small team, big heart</p>
+    </div>
+
+    <div class="team-grid">
+
+      <div class="member-card">
+        <div class="member-avatar">👑</div>
+        <div class="member-info">
+          <div class="member-name">Keogo</div>
+          <span class="member-role">Founder & Admin</span>
+          <p class="member-bio">
+            Designer and developer of Gradeeting. PGE2 EN student at Aivancity.
+            Built the whole platform solo, from idea to deployment. Handles moderation,
+            answers questions, and keeps the site alive.
+          </p>
+        </div>
+      </div>
+
+      <div class="member-card">
+        <div class="member-avatar">🌟</div>
+        <div class="member-info">
+          <div class="member-name">The Volunteers</div>
+          <span class="member-role">The stars of Aivancity</span>
+          <p class="member-bio">
+            Gradeeting exists because <strong>students and teachers</strong> agreed to appear.
+            They chose to be visible, open to honest feedback, and welcoming to new faces.
+            They are the real soul of the project.
+          </p>
+        </div>
+      </div>
+
+      <div class="member-card">
+        <div class="member-avatar">💬</div>
+        <div class="member-info">
+          <div class="member-name">The Community</div>
+          <span class="member-role">Commenters & supporters</span>
+          <p class="member-bio">
+            Everyone who leaves a kind comment, reports abuse, suggests an idea or shares
+            the site with a friend. Your participation makes the campus warmer.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="values-card">
+      <h2>Our values</h2>
+      <ul class="values-list">
+        <li><strong>Voluntary first.</strong> Nobody appears without agreeing to.</li>
+        <li><strong>Kind honesty.</strong> Feedback should help, never hurt.</li>
+        <li><strong>Anonymity protects.</strong> No accounts, no tracking, no pressure.</li>
+        <li><strong>Simple wins.</strong> Fewer features, better experience.</li>
+        <li><strong>Community over code.</strong> The people matter more than the tech.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const THEME_KEY = "gradeeting_theme";
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else if (!savedTheme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  </script>
+</body>
+</html>
