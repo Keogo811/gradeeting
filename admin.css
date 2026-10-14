@@ -622,3 +622,39 @@ body {
 .modal-message.success {
   color: #1a7f37;
 }
+
+/* ---------- Upload photo dans le modal ---------- */
+.photo-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.photo-controls input[type="file"] {
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 0.4rem 0;
+}
+
+.photo-or {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
+.photo-status {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-family: 'Nunito', sans-serif;
+  min-height: 1.2em;
+}
+
+.photo-status.error {
+  color: #b42318;
+}
+
+.photo-status.success {
+  color: #1a7f37;
+}

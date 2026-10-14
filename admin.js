@@ -566,9 +566,14 @@ function openEditVolunteerModal(volunteer) {
     <label>Description</label>
     <textarea id="edit-description" maxlength="500">${escapeHtml(volunteer.description || "")}</textarea>
 
-    <label>Photo URL</label>
-    <input type="text" id="edit-photo-url" value="${escapeAttr(volunteer.photo_url || "")}">
+    <label>Photo</label>
+    <div class="photo-controls">
+      <input type="file" id="edit-photo-file" accept="image/*">
+      <span class="photo-or">or</span>
+      <input type="text" id="edit-photo-url" placeholder="Paste an image URL" value="${escapeAttr(volunteer.photo_url || "")}">
+    </div>
     <img class="preview" id="edit-photo-preview" src="${photo}" alt="preview" onerror="this.src='${PLACEHOLDER}'">
+    <div id="edit-photo-status" class="photo-status"></div>
 
     <label>Instagram</label>
     <input type="text" id="edit-instagram" maxlength="50" value="${escapeAttr(volunteer.instagram || "")}">
@@ -598,9 +603,55 @@ function openEditVolunteerModal(volunteer) {
 
   editModal.classList.remove("hidden");
 
-  document.getElementById("edit-photo-url").addEventListener("input", (e) => {
-    const preview = document.getElementById("edit-photo-preview");
-    preview.src = e.target.value || PLACEHOLDER;
+  const photoUrlInput = document.getElementById("edit-photo-url");
+  const photoFileInput = document.getElementById("edit-photo-file");
+  const photoPreview = document.getElementById("edit-photo-preview");
+
+  // Quand on change l'URL à la main
+  photoUrlInput.addEventListener("input", (e) => {
+    photoPreview.src = e.target.value || PLACEHOLDER;
+  });
+
+  // Quand on choisit un fichier
+  photoFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Aperçu immédiat en local
+    const reader = new FileReader();
+    reader.onload = (ev) => { photoPreview.src = ev.target.result; };
+    reader.readAsDataURL(file);
+
+    // Message de statut
+    const status = document.getElementById("edit-photo-status");
+    status.textContent = "⏳ Uploading...";
+    status.className = "photo-status";
+
+    // Upload vers Supabase Storage
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from("volunteer-photos")
+      .upload(fileName, file);
+
+    if (uploadError) {
+      console.error("Erreur upload :", uploadError.message);
+      status.textContent = "❌ Upload failed. Try again.";
+      status.classList.add("error");
+      return;
+    }
+
+    // Récupérer l'URL publique
+    const { data: urlData } = supabaseClient.storage
+      .from("volunteer-photos")
+      .getPublicUrl(fileName);
+
+    photoUrlInput.value = urlData.publicUrl;
+    photoPreview.src = urlData.publicUrl;
+
+    status.textContent = "✅ Photo uploaded. Click Save to apply.";
+    status.classList.add("success");
   });
 
   document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
