@@ -1295,5 +1295,41 @@ if (footerSuggest) {
   });
 }
 
-// 28. Année dynamique dans le footer
+// 28. Menu dropdown top-left
+const menuToggle = document.getElementById("menu-toggle");
+const menuDropdown = document.getElementById("menu-dropdown");
+
+if (menuToggle && menuDropdown) {
+  menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = !menuDropdown.classList.contains("hidden");
+    if (isOpen) {
+      menuDropdown.classList.add("hidden");
+      menuToggle.classList.remove("open");
+    } else {
+      menuDropdown.classList.remove("hidden");
+      menuToggle.classList.add("open");
+    }
+  });
+
+  // Fermer en cliquant ailleurs
+  document.addEventListener("click", (e) => {
+    if (!menuDropdown.classList.contains("hidden")) {
+      if (!menuDropdown.contains(e.target) && e.target !== menuToggle) {
+        menuDropdown.classList.add("hidden");
+        menuToggle.classList.remove("open");
+      }
+    }
+  });
+
+  // Fermer avec la touche Échap
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menuDropdown.classList.contains("hidden")) {
+      menuDropdown.classList.add("hidden");
+      menuToggle.classList.remove("open");
+    }
+  });
+}
+
+// 29. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
