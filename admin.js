@@ -376,11 +376,13 @@ async function updateReport(reportId, newStatus) {
 
   if (error) {
     console.error("Erreur mise à jour report :", error.message);
-    alert("Error updating report. Please try again.");
+    console.error("Alert: Error updating report.");
     return;
   }
 
+  // Rafraîchir l'onglet Pending ET l'onglet Reports
   loadReports();
+  if (typeof loadAllReports === "function") loadAllReports();
   loadStats();
 }
 
@@ -1057,11 +1059,121 @@ function renderAllComments() {
 document.getElementById("comments-search").addEventListener("input", renderAllComments);
 document.getElementById("comments-status-filter").addEventListener("change", renderAllComments);
 
-// ---------- Onglet Reports (placeholder) ----------
+// ---------- Onglet Reports : tous les signalements ----------
+let allReportsCache = [];
+
 async function loadAllReports() {
-  document.getElementById("all-reports").innerHTML =
-    '<p class="empty-state">Coming soon...</p>';
+  const container = document.getElementById("all-reports");
+  container.innerHTML = '<p class="loading">Loading...</p>';
+
+  const { data, error } = await supabaseClient
+    .from("reports")
+    .select("id, reason, status, created_at, comments(id, body, sentiment, status, volunteers(name))")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Erreur chargement reports :", error.message);
+    container.innerHTML = '<p class="empty-state">Error loading reports.</p>';
+    return;
+  }
+
+  allReportsCache = data;
+  renderAllReports();
 }
+
+function renderAllReports() {
+  const container = document.getElementById("all-reports");
+  const statusFilter = document.getElementById("reports-status-filter").value;
+
+  const filtered = allReportsCache.filter((r) => {
+    return !statusFilter || r.status === statusFilter;
+  });
+
+  container.innerHTML = "";
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="empty-state">No reports match your filter.</p>';
+    return;
+  }
+
+  filtered.forEach((r) => {
+    const card = document.createElement("div");
+    card.className = "admin-card";
+
+    const comment = r.comments;
+    const volunteerName = comment && comment.volunteers ? comment.volunteers.name : "Unknown";
+    const commentBody = comment ? comment.body : "(comment deleted)";
+    const commentSentiment = comment ? comment.sentiment : "unknown";
+    const commentStatus = comment ? comment.status : "unknown";
+
+    const statusTag = `<span class="tag tag-${r.status === "reviewed" ? "positive" : r.status === "dismissed" ? "pending" : "negative"}">${r.status}</span>`;
+
+    card.innerHTML = `
+      <div class="admin-card-header">
+        <div class="admin-card-title">Report on comment about ${escapeHtml(volunteerName)} ${statusTag}</div>
+        <div class="admin-card-meta">${new Date(r.created_at).toLocaleString()}</div>
+      </div>
+      <div class="admin-card-body">
+        <p style="margin-bottom:0.4rem;"><strong>Reported comment:</strong></p>
+        <p style="font-style:italic;color:#666;">"${escapeHtml(commentBody)}" (${commentSentiment} · ${commentStatus})</p>
+        <p style="margin-top:0.6rem;"><strong>Reason:</strong> ${escapeHtml(r.reason)}</p>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "admin-card-actions";
+
+    // Bouton "Voir le commentaire" si le commentaire existe encore
+    if (comment && comment.id) {
+      const viewBtn = document.createElement("button");
+      viewBtn.className = "btn-neutral";
+      viewBtn.textContent = "👁️ View comment";
+      viewBtn.addEventListener("click", () => {
+        // Bascule sur l'onglet Comments et cherche le commentaire
+        const tabBtn = document.querySelector('.tab-button[data-tab="comments"]');
+        if (tabBtn) tabBtn.click();
+
+        // Pré-remplit la recherche avec un extrait du commentaire
+        setTimeout(() => {
+          const searchInput = document.getElementById("comments-search");
+          if (searchInput) {
+            searchInput.value = commentBody.substring(0, 40);
+            searchInput.dispatchEvent(new Event("input"));
+          }
+        }, 200);
+      });
+      actions.appendChild(viewBtn);
+    }
+
+    // Bouton "Mark as reviewed" si pending
+    if (r.status === "pending") {
+      const reviewedBtn = document.createElement("button");
+      reviewedBtn.className = "btn-approve";
+      reviewedBtn.textContent = "✓ Mark as reviewed";
+      reviewedBtn.addEventListener("click", () => updateReport(r.id, "reviewed"));
+      actions.appendChild(reviewedBtn);
+
+      const dismissBtn = document.createElement("button");
+      dismissBtn.className = "btn-neutral";
+      dismissBtn.textContent = "Dismiss";
+      dismissBtn.addEventListener("click", () => updateReport(r.id, "dismissed"));
+      actions.appendChild(dismissBtn);
+    } else {
+      // Bouton pour réinitialiser le statut (remettre en pending)
+      const resetBtn = document.createElement("button");
+      resetBtn.className = "btn-neutral";
+      resetBtn.textContent = "↺ Reset to pending";
+      resetBtn.addEventListener("click", () => updateReport(r.id, "pending"));
+      actions.appendChild(resetBtn);
+    }
+
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
+// Brancher le filtre Reports
+document.getElementById("reports-status-filter").addEventListener("change", renderAllReports);
 
 // ---------- Brancher les filtres Volunteers ----------
 document.getElementById("volunteers-search").addEventListener("input", renderAllVolunteers);

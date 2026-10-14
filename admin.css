@@ -658,3 +658,14 @@ body {
 .photo-status.success {
   color: #1a7f37;
 }
+
+/* ---------- Bouton de visualisation d'un commentaire ---------- */
+.btn-neutral[data-action="view"] {
+  background: var(--rose-soft, #FBD5DC);
+  color: var(--rose-deep, #C73E56);
+}
+
+.btn-neutral[data-action="view"]:hover {
+  background: var(--rose, #E85D75);
+  color: white;
+}
