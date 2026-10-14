@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stats — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --cream: #FFF8F2;
+      --cream-deep: #FDEFE6;
+      --white: #FFFFFF;
+      --rose: #E85D75;
+      --rose-deep: #C73E56;
+      --rose-soft: #FBD5DC;
+      --honey: #FFB627;
+      --honey-soft: #FFE4A8;
+      --text: #3D2C2F;
+      --text-muted: #8B7276;
+      --border: #F3E1DA;
+      --shadow-sm: 0 2px 8px rgba(199, 62, 86, 0.06);
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --shadow-lg: 0 8px 24px rgba(199, 62, 86, 0.12);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    [data-theme="dark"] {
+      --cream: #1E1819;
+      --cream-deep: #2A2123;
+      --white: #2E2527;
+      --rose: #F07C90;
+      --rose-deep: #E85D75;
+      --rose-soft: #4A2C33;
+      --honey: #FFB627;
+      --honey-soft: #4A3A1E;
+      --text: #F5EBE8;
+      --text-muted: #B8A2A5;
+      --border: #3E2F32;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', system-ui, sans-serif;
+      background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 1.5rem;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Rayons de soleil */
+    .sun-rays {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200vmax;
+      height: 200vmax;
+      pointer-events: none;
+      z-index: 0;
+      background: repeating-conic-gradient(
+        from 0deg at 50% 0%,
+        transparent 0deg,
+        rgba(255, 182, 39, 0.09) 3deg,
+        transparent 6deg,
+        transparent 10deg,
+        rgba(255, 182, 39, 0.06) 13deg,
+        transparent 16deg
+      );
+      -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      opacity: 0.85;
+    }
+
+    [data-theme="dark"] .sun-rays {
+      background: repeating-conic-gradient(
+        from 0deg at 50% 0%,
+        transparent 0deg,
+        rgba(232, 93, 117, 0.07) 3deg,
+        transparent 6deg,
+        transparent 10deg,
+        rgba(255, 182, 39, 0.05) 13deg,
+        transparent 16deg
+      );
+      opacity: 0.7;
+    }
+
+    .stats-page {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stats-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+
+    .stats-header h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .stats-header p {
+      color: var(--text-muted);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+    }
+
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--white);
+      border: 2px solid var(--rose-soft);
+      color: var(--rose-deep);
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s;
+    }
+
+    .back-home:hover {
+      background: var(--rose-soft);
+      transform: translateX(-2px);
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .kpi-card {
+      background: var(--white);
+      padding: 1.2rem 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+      border-top: 4px solid var(--honey);
+    }
+
+    .kpi-value {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--rose-deep);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .kpi-label {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 500;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Chart cards */
+    .chart-card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+      border-top: 5px solid var(--rose);
+    }
+
+    .chart-card h2 {
+      font-family: 'Fredoka', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--rose-deep);
+      margin-bottom: 1rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 280px;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--rose-deep);
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 600px) {
+      .stats-header h1 { font-size: 1.7rem; }
+      .kpi-value { font-size: 1.6rem; }
+      .chart-container { height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sun-rays" aria-hidden="true"></div>
+
+  <div class="stats-page">
+    <div class="stats-header">
+      <a href="index.html" class="back-home">← Back to Gradeeting</a>
+      <h1>📊 Gradeeting Stats</h1>
+      <p>A live look at the Aivancity community</p>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-volunteers">—</div>
+        <div class="kpi-label">🌸 Volunteers</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-teachers">—</div>
+        <div class="kpi-label">🎓 Teachers</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-comments">—</div>
+        <div class="kpi-label">💬 Comments</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="kpi-visits">—</div>
+        <div class="kpi-label">👀 Visits</div>
+      </div>
+    </div>
+
+    <div id="charts-wrapper">
+      <div class="loading-state">Loading stats...</div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Thème
+    const THEME_KEY = "gradeeting_theme";
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else if (!savedTheme && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
+    // Normalisation classe (copie simplifiée)
+    function normalizeClass(input) {
+      if (!input) return "";
+      let s = input.trim().toUpperCase().replace(/\s+/g, " ");
+      if (/^(TEACHER|PROF|PROFESSOR|PROFESSEUR|PROFS)$/i.test(s)) return "Teacher";
+      const pgeMatch = s.match(/^PGE\s*-?\s*(\d+)\s*-?\s*([A-Z]{2,3})?$/);
+      if (pgeMatch) {
+        const year = pgeMatch[1];
+        const lang = pgeMatch[2];
+        return lang ? `PGE${year} ${lang}` : `PGE${year}`;
+      }
+      return s;
+    }
+
+    // Couleurs des charts selon le thème
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const COLORS = {
+      rose: "#E85D75",
+      roseDeep: "#C73E56",
+      roseSoft: "#FBD5DC",
+      honey: "#FFB627",
+      honeySoft: "#FFE4A8",
+      green: "#7BA88B",
+      blue: "#88C9E0",
+      purple: "#C9A7E8",
+      coral: "#FF8C42",
+      text: isDark ? "#F5EBE8" : "#3D2C2F",
+      textMuted: isDark ? "#B8A2A5" : "#8B7276",
+      grid: isDark ? "#3E2F32" : "#F3E1DA",
+    };
+
+    Chart.defaults.font.family = "'Nunito', system-ui, sans-serif";
+    Chart.defaults.color = COLORS.textMuted;
+
+    async function loadStats() {
+      const wrapper = document.getElementById("charts-wrapper");
+
+      // Charger toutes les données en parallèle
+      const [volRes, comRes, visRes] = await Promise.all([
+        supabaseClient.from("volunteers").select("id, class, status").eq("status", "approved"),
+        supabaseClient.from("comments").select("id, sentiment, status, volunteer_id, created_at").eq("status", "approved"),
+        supabaseClient.from("visits").select("*", { count: "exact", head: true }),
+      ]);
+
+      if (volRes.error || comRes.error) {
+        console.error(volRes.error || comRes.error);
+        wrapper.innerHTML = '<div class="error-state">Unable to load stats right now.</div>';
+        return;
+      }
+
+      const volunteers = volRes.data || [];
+      const comments = comRes.data || [];
+      const visitsCount = visRes.count || 0;
+
+      // KPIs
+      const teachers = volunteers.filter(v => normalizeClass(v.class) === "Teacher").length;
+      document.getElementById("kpi-volunteers").textContent = volunteers.length;
+      document.getElementById("kpi-teachers").textContent = teachers;
+      document.getElementById("kpi-comments").textContent = comments.length;
+      document.getElementById("kpi-visits").textContent = visitsCount;
+
+      // Préparer les charts
+      wrapper.innerHTML = `
+        <div class="chart-card">
+          <h2>🌸 Volunteers by class</h2>
+          <div class="chart-container"><canvas id="chart-classes"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>💬 Comments by sentiment</h2>
+          <div class="chart-container"><canvas id="chart-sentiment"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>📈 Comments over the last 30 days</h2>
+          <div class="chart-container"><canvas id="chart-timeline"></canvas></div>
+        </div>
+
+        <div class="chart-card">
+          <h2>⭐ Top 5 most commented volunteers</h2>
+          <div class="chart-container"><canvas id="chart-top"></canvas></div>
+        </div>
+      `;
+
+      // Chart 1 : Volunteers by class
+      const classCounts = {};
+      volunteers.forEach(v => {
+        const cls = normalizeClass(v.class) || "Unknown";
+        classCounts[cls] = (classCounts[cls] || 0) + 1;
+      });
+      const classLabels = Object.keys(classCounts).sort((a, b) => classCounts[b] - classCounts[a]);
+      const classData = classLabels.map(l => classCounts[l]);
+
+      new Chart(document.getElementById("chart-classes"), {
+        type: "bar",
+        data: {
+          labels: classLabels,
+          datasets: [{
+            data: classData,
+            backgroundColor: [COLORS.rose, COLORS.honey, COLORS.purple, COLORS.blue, COLORS.coral, COLORS.green, COLORS.roseSoft],
+            borderRadius: 8,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, color: COLORS.textMuted }, grid: { color: COLORS.grid } },
+            x: { ticks: { color: COLORS.text }, grid: { display: false } },
+          },
+        },
+      });
+
+      // Chart 2 : Comments by sentiment
+      const positive = comments.filter(c => c.sentiment === "positive").length;
+      const negative = comments.filter(c => c.sentiment === "negative").length;
+
+      new Chart(document.getElementById("chart-sentiment"), {
+        type: "doughnut",
+        data: {
+          labels: ["Positive", "Negative"],
+          datasets: [{
+            data: [positive, negative],
+            backgroundColor: [COLORS.green, COLORS.roseDeep],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "65%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: { color: COLORS.text, padding: 16, font: { size: 13 } },
+            },
+          },
+        },
+      });
+
+      // Chart 3 : Comments over the last 30 days
+      const days = [];
+      const countsPerDay = {};
+      const today = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const key = d.toISOString().split("T")[0];
+        days.push(key);
+        countsPerDay[key] = 0;
+      }
+      comments.forEach(c => {
+        const key = c.created_at.split("T")[0];
+        if (countsPerDay[key] !== undefined) countsPerDay[key]++;
+      });
+      const timelineData = days.map(d => countsPerDay[d]);
+
+      new Chart(document.getElementById("chart-timeline"), {
+        type: "line",
+        data: {
+          labels: days.map(d => {
+            const dt = new Date(d);
+            return `${dt.getDate()}/${dt.getMonth() + 1}`;
+          }),
+          datasets: [{
+            data: timelineData,
+            borderColor: COLORS.roseDeep,
+            backgroundColor: "rgba(232, 93, 117, 0.12)",
+            fill: true,
+            tension: 0.35,
+            pointRadius: 3,
+            pointBackgroundColor: COLORS.roseDeep,
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, color: COLORS.textMuted }, grid: { color: COLORS.grid } },
+            x: { ticks: { color: COLORS.textMuted, maxRotation: 45, minRotation: 45 }, grid: { display: false } },
+          },
+        },
+      });
+
+      // Chart 4 : Top 5 most commented volunteers
+      const volNames = {};
+      volunteers.forEach(v => { volNames[v.id] = v.class; });
+
+      const commentCounts = {};
+      comments.forEach(c => {
+        if (c.volunteer_id) {
+          commentCounts[c.volunteer_id] = (commentCounts[c.volunteer_id] || 0) + 1;
+        }
+      });
+
+      // Recharger les noms des volontaires top (on n'a que l'id dans comments)
+      const topIds = Object.keys(commentCounts).sort((a, b) => commentCounts[b] - commentCounts[a]).slice(0, 5);
+
+      let topLabels = [];
+      let topData = [];
+
+      if (topIds.length > 0) {
+        const { data: topVols } = await supabaseClient
+          .from("volunteers")
+          .select("id, name")
+          .in("id", topIds);
+
+        const nameMap = {};
+        (topVols || []).forEach(v => { nameMap[v.id] = v.name; });
+
+        topLabels = topIds.map(id => nameMap[id] || "Unknown");
+        topData = topIds.map(id => commentCounts[id]);
+      }
+
+      new Chart(document.getElementById("chart-top"), {
+        type: "bar",
+        data: {
+          labels: topLabels.length > 0 ? topLabels : ["No comments yet"],
+          datasets: [{
+            data: topData.length > 0 ? topData : [0],
+            backgroundColor: COLORS.honey,
+            borderRadius: 8,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { beginAtZero: true, ticks: { stepSize: 1, color: COLORS.textMuted }, grid: { color: COLORS.grid } },
+            y: { ticks: { color: COLORS.text }, grid: { display: false } },
+          },
+        },
+      });
+    }
+
+    loadStats();
+  </script>
+</body>
+</html>
