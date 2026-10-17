@@ -2529,6 +2529,360 @@ body.page-width-wide .detail-header {
 [data-theme="dark"] .volunteer-reply strong { color: var(--honey); }
 [data-theme="dark"] .volunteer-reply p { color: #F5EBE8; }
 
+/* =========================================
+   SPRINT 33 - GLASSMORPHISM & NAVIGATION
+   ========================================= */
+
+/* --- Navigation & Menu --- */
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.2rem;
+  width: auto !important; /* Pour écraser l'ancien style rond */
+  border-radius: 999px !important;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  color: var(--rose-deep);
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(8px);
+  border: 2px solid var(--rose-soft) !important;
+}
+
+.menu-toggle.open {
+  background: var(--rose-soft) !important;
+  transform: none !important; /* On annule la rotation */
+}
+
+.menu-dropdown {
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 10px 30px rgba(199, 62, 86, 0.15) !important;
+}
+
+[data-theme="dark"] .menu-toggle,
+[data-theme="dark"] .menu-dropdown {
+  background: rgba(46, 37, 39, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.menu-item.highlight-item {
+  background: var(--honey-soft);
+  color: #8a5b00;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.menu-item.highlight-item:hover {
+  background: var(--honey);
+}
+
+/* --- Lien Espace Volontaire (Header) --- */
+.volunteer-callout {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  background: var(--honey-soft);
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border-radius: 999px;
+  color: #6b4a00;
+  border: 1px solid var(--honey);
+}
+.volunteer-callout a {
+  color: var(--rose-deep);
+  font-weight: 700;
+  text-decoration: none;
+}
+.volunteer-callout a:hover {
+  text-decoration: underline;
+}
+[data-theme="dark"] .volunteer-callout {
+  background: #4A3A1E;
+  color: #F5EBE8;
+  border-color: var(--honey);
+}
+
+/* --- Effet Glassmorphism sur les cartes --- */
+.volunteer-card, 
+.about-section, 
+.game-card, 
+.stats-bar {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(199, 62, 86, 0.08) !important;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background 0.3s ease;
+}
+
+[data-theme="dark"] .volunteer-card,
+[data-theme="dark"] .about-section,
+[data-theme="dark"] .game-card,
+[data-theme="dark"] .stats-bar {
+  background: rgba(46, 37, 39, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.volunteer-card:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  transform: translateY(-6px) scale(1.02) !important;
+  box-shadow: 0 15px 40px rgba(199, 62, 86, 0.15) !important;
+}
+
+[data-theme="dark"] .volunteer-card:hover {
+  background: rgba(46, 37, 39, 0.95) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* =========================================
+   SPRINT 33 - FANCY CARDS & STAR OF THE DAY
+   ========================================= */
+
+/* --- 1. Cartes Volontaires Plus Fancy --- */
+.volunteer-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Effet de zoom sur la photo au survol */
+.volunteer-card img {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.volunteer-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Reflet lumineux au survol */
+.volunteer-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.volunteer-card:hover::after {
+  opacity: 1;
+}
+
+/* Le badge de classe un peu plus pop */
+.class-tag {
+  background: linear-gradient(135deg, var(--honey-soft), var(--honey)) !important;
+  color: #4a2c00 !important;
+  box-shadow: 0 2px 6px rgba(255, 182, 39, 0.3);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* --- 2. Star of the Day Plus Fancy --- */
+.featured-section {
+  padding: 2rem !important;
+  position: relative;
+  overflow: hidden;
+  /* Halo doré autour de la carte */
+  box-shadow: 0 10px 40px rgba(255, 182, 39, 0.2), inset 0 0 0 2px rgba(255, 182, 39, 0.3) !important;
+}
+
+/* Lueur en arrière-plan */
+.featured-section::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255, 182, 39, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.featured-content {
+  position: relative;
+  z-index: 1;
+  gap: 2rem !important; /* Plus d'espace entre la photo et le texte */
+}
+
+/* Photo beaucoup plus grande et lumineuse */
+.featured-photo {
+  width: 160px !important;
+  height: 160px !important;
+  border: 4px solid var(--honey) !important;
+  box-shadow: 0 0 20px rgba(255, 182, 39, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.featured-section:hover .featured-photo {
+  transform: scale(1.05) rotate(2deg);
+}
+
+/* Nom en grand avec un dégradé */
+.featured-info h2 {
+  font-size: 2.2rem !important;
+  background: linear-gradient(135deg, var(--rose-deep) 0%, var(--honey) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.2;
+}
+
+/* Badge "Star of the day" encore plus visible */
+.featured-badge {
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep)) !important;
+  color: white !important;
+  font-size: 0.9rem !important;
+  padding: 0.4rem 1.2rem !important;
+  box-shadow: 0 4px 12px rgba(199, 62, 86, 0.4) !important;
+}
+
+/* --- 3. Adaptation Mobile --- */
+@media (max-width: 600px) {
+  .featured-photo {
+    width: 120px !important;
+    height: 120px !important;
+  }
+  .featured-info h2 {
+    font-size: 1.8rem !important;
+  }
+  .featured-section {
+    padding: 1.2rem !important;
+  }
+}
+
+/* =========================================
+   SPRINT 33 - ROSE TOUCH & FANCY HEADER
+   ========================================= */
+
+/* --- 1. Plus de Rose dans le fond --- */
+body {
+  /* On ajoute un dégradé rosé tout en haut qui fond vers le crème */
+  background-image: linear-gradient(180deg, #FFE4E9 0%, var(--cream) 25%, var(--cream-deep) 100%) !important;
+}
+
+[data-theme="dark"] body {
+  background-image: linear-gradient(180deg, #2A181C 0%, var(--cream) 25%, var(--cream-deep) 100%) !important;
+}
+
+/* --- 2. Titre & Sous-titre Fancy --- */
+.site-header h1 {
+  /* Texte en dégradé (Rose -> Miel) */
+  background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 40%, var(--honey) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 3.2rem !important; /* Un peu plus grand */
+  letter-spacing: 0.08em;
+  filter: drop-shadow(0 4px 10px rgba(232, 93, 117, 0.25)); /* Ombre lumineuse */
+  margin-bottom: 0.2rem;
+}
+
+.tagline {
+  color: var(--rose-deep) !important;
+  font-weight: 600 !important;
+  font-size: 1.2rem !important;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8); /* Petit halo blanc pour la lisibilité */
+}
+
+[data-theme="dark"] .tagline {
+  color: var(--rose) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* --- 3. Fleurs latérales (Sans le flou bizarre) --- */
+.floral-band {
+  opacity: 0.85 !important;
+  animation: breathe-flowers 6s ease-in-out infinite alternate;
+}
+
+@keyframes breathe-flowers {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.02); opacity: 0.95; }
+}
+
+.floral-band-right {
+  animation: breathe-flowers-right 6s ease-in-out infinite alternate;
+}
+
+@keyframes breathe-flowers-right {
+  0% { transform: scaleX(-1) scale(1); opacity: 0.8; }
+  100% { transform: scaleX(-1) scale(1.02); opacity: 0.95; }
+}
+
+/* Annule l'effet miroir de l'animation pour le côté droit */
+.floral-band-right {
+  animation: breathe-flowers-right 6s ease-in-out infinite alternate;
+}
+
+@keyframes breathe-flowers-right {
+  0% { transform: scaleX(-1) scale(1); opacity: 0.8; }
+  100% { transform: scaleX(-1) scale(1.03); opacity: 0.95; }
+}
+
+[data-theme="dark"] .floral-band {
+  filter: drop-shadow(0 0 15px rgba(240, 124, 144, 0.3)) saturate(1.1);
+}
+
+/* --- 4. Stats Bar un peu plus rosée --- */
+.stats-bar {
+  background: rgba(255, 230, 235, 0.75) !important; /* Voile rosé */
+  border: 1px solid rgba(232, 93, 117, 0.15) !important;
+  box-shadow: 0 4px 15px rgba(232, 93, 117, 0.1) !important;
+}
+
+[data-theme="dark"] .stats-bar {
+  background: rgba(74, 44, 51, 0.75) !important;
+  border-color: rgba(232, 93, 117, 0.2) !important;
+}
+
+/* --- Adaptation Mobile --- */
+@media (max-width: 600px) {
+  .site-header h1 {
+    font-size: 2.4rem !important;
+  }
+  .tagline {
+    font-size: 1rem !important;
+  }
+}
+
+/* --- Fleurs Lévitantes du Titre (Gauche & Droite) --- */
+.levitating-flower {
+  position: absolute;
+  top: 22%;
+  font-size: 3.5rem;
+  display: inline-block;
+  z-index: 2;
+  pointer-events: none; /* Ne gêne pas les clics */
+  /* Effet brillant (halo doré et rose) */
+  filter: drop-shadow(0 0 12px rgba(255, 182, 39, 0.8)) drop-shadow(0 0 20px rgba(232, 93, 117, 0.4));
+  animation: float-title 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Fleur de gauche */
+.levitating-flower.f1 {
+  left: 22%;
+  animation-delay: 0s;
+}
+
+/* Fleur de droite */
+.levitating-flower.f2 {
+  right: 22%;
+  animation-delay: -2s; /* Décalage pour que les deux ne bougent pas en même temps */
+}
+
+@keyframes float-title {
+  0%, 100% { transform: translateY(0) rotate(-10deg); }
+  50%      { transform: translateY(-15px) rotate(10deg); }
+}
+
+/* Sur mobile, on les cache pour ne pas surcharger le titre */
+@media (max-width: 800px) {
+  .levitating-flower {
+    display: none;
+  }
+}
+
 /* ---------- Compteur de visites ---------- */
 .visit-count {
   margin-top: 0.3rem;

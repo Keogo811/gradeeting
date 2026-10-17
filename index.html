@@ -30,24 +30,33 @@
   <!-- Bandeau d'annonce -->
   <div id="announcement" class="announcement hidden">
     <span class="announcement-text">
-      🎉 Gradeeting v26.9 is live — News pages available at up-left and new design!
+      🎉 Gradeeting v33 is live — Volunteer Hub, new fancy design, new music box and more!
     </span>
     <button id="announcement-close" class="announcement-close" aria-label="Close" type="button">✕</button>
   </div>
 
   <header class="site-header">
     <div class="menu-wrapper">
-      <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" type="button">☰</button>
+      <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" type="button">
+        <span class="menu-icon">☰</span> <span class="menu-text">Menu</span>
+      </button>
       <div id="menu-dropdown" class="menu-dropdown hidden">
-        <a href="faq.html" class="menu-item">❓ FAQ</a>
+        <a href="volunteer.html" class="menu-item highlight-item">🔐 Volunteer Hub</a>
         <a href="stats.html" class="menu-item">📊 Stats</a>
+        <a href="faq.html" class="menu-item">❓ FAQ</a>
         <a href="changelog.html" class="menu-item">📝 Changelog</a>
         <a href="team.html" class="menu-item">🌸 Team</a>
         <a href="qr.html" class="menu-item">📱 QR Code</a>
       </div>
     </div>
+
+    <!-- Fleurs lévitantes du titre -->
+    <span class="levitating-flower f1" aria-hidden="true">🌸</span>
+    <span class="levitating-flower f2" aria-hidden="true">🌸</span>
+    
     <h1>GRADEETING</h1>
     <p class="tagline">✨ Discover the stars of Aivancity ✨</p>
+    <p class="volunteer-callout">Already a volunteer? <a href="volunteer.html">Access your hub here</a></p>
     <nav class="header-nav">
       <button id="nav-about" class="nav-link" type="button">🌸 About</button>
       <button id="nav-volunteer" class="nav-link" type="button">✨ Become a volunteer</button>
@@ -241,6 +250,7 @@
       <a href="stats.html" class="footer-link">📊 Stats</a>
       <a href="changelog.html" class="footer-link">Changelog</a>
       <a href="team.html" class="footer-link">Team</a>
+      <a href="volunteer.html" class="footer-link">🔐 Volunteer Hub</a>
     </nav>
     <p class="footer-credits">Aivancity student project — <span id="year"></span></p>
     <p class="visit-count">👀 <span id="visit-total">—</span> visits so far</p>
