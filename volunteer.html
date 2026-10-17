@@ -31,6 +31,39 @@
       font-family: 'Nunito', system-ui, sans-serif; background: var(--cream);
       background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
       background-attachment: fixed; color: var(--text); padding: 1.5rem; line-height: 1.6; min-height: 100vh;
+      overflow-x: hidden; /* Empêche le défilement horizontal causé par les fleurs */
+    }
+
+    /* ---------- Décorations (Fleurs imposantes & Abeilles) ---------- */
+    .deco-flower {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12rem;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+      filter: drop-shadow(0 0 20px rgba(199, 62, 86, 0.3));
+    }
+    .deco-flower.left { left: -3rem; color: var(--rose); }
+    .deco-flower.right { right: -3rem; color: var(--honey); transform: translateY(-50%) scaleX(-1); }
+
+    [data-theme="dark"] .deco-flower { opacity: 0.08; }
+
+    .deco-bee {
+      position: fixed;
+      font-size: 2.5rem;
+      z-index: 0;
+      pointer-events: none;
+      animation: float-bee 6s ease-in-out infinite;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+    .deco-bee.one { top: 15%; right: 10%; animation-delay: 0s; }
+    .deco-bee.two { bottom: 20%; left: 8%; animation-delay: -3s; font-size: 2rem; }
+
+    @keyframes float-bee {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(10deg); }
     }
 
     /* Rayons de soleil */
@@ -56,7 +89,7 @@
     .back-home { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; font-weight: 500; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; margin-bottom: 1rem; box-shadow: var(--shadow-sm); transition: all 0.15s; }
     .back-home:hover { background: var(--rose-soft); transform: translateX(-2px); }
 
-    .card { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border-top: 6px solid var(--rose); margin-bottom: 2rem; }
+    .card { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border-top: 6px solid var(--rose); margin-bottom: 2rem; position: relative; z-index: 1; }
     .hidden { display: none !important; }
     
     /* Formulaires */
@@ -83,13 +116,29 @@
     .message.success { color: #2b7a4b; font-weight: 600; }
     .message.error { color: var(--rose-deep); font-weight: 600; }
 
+    /* Encart de contact Admin */
+    .contact-admin-notice {
+      background: var(--honey-soft);
+      border-left: 4px solid var(--honey);
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.9rem;
+      color: #4a2c00;
+    }
+    [data-theme="dark"] .contact-admin-notice { background: #4A3A1E; color: #F5EBE8; border-left-color: var(--honey); }
+    .contact-admin-notice span.icon { font-size: 1.5rem; }
+
     /* Dashboard - Header */
     .dash-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top-color: var(--honey); }
     .dash-header h2 { font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--rose-deep); margin-bottom: 0.2rem; }
     .logout-btn { width: auto; background: var(--rose-soft); color: var(--rose-deep); border: 2px solid var(--rose); padding: 0.5rem 1rem; font-size: 0.9rem; }
 
     /* Métriques */
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; position: relative; z-index: 1; }
     .metric-card { background: var(--white); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); text-align: center; border-top: 4px solid var(--honey); }
     .metric-value { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 2rem; color: var(--rose-deep); line-height: 1; margin-bottom: 0.4rem; }
     .metric-label { font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 0.85rem; color: var(--text-muted); }
@@ -98,7 +147,7 @@
     .section-title { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.2rem; color: var(--text); margin-bottom: 1rem; border-bottom: 2px dashed var(--rose-soft); padding-bottom: 0.5rem; }
     
     /* Commentaires */
-    .comment-item { background: var(--white); padding: 1.2rem 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 1rem; border-left: 5px solid var(--honey-soft); }
+    .comment-item { background: var(--white); padding: 1.2rem 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 1rem; border-left: 5px solid var(--honey-soft); position: relative; z-index: 1; }
     .comment-sentiment { font-family: 'Fredoka', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 0.05em; }
     .comment-sentiment.positive { color: #2b7a4b; }
     .comment-sentiment.negative { color: var(--rose-deep); }
@@ -115,11 +164,17 @@
       .card { padding: 1.5rem; }
       .dash-header { flex-direction: column; text-align: center; }
       .metrics-grid { grid-template-columns: 1fr; }
+      .deco-flower { font-size: 8rem; top: 20%; } /* Adapte la position des fleurs sur mobile */
     }
   </style>
 </head>
 <body>
+  <!-- Décorations -->
   <div class="sun-rays" aria-hidden="true"></div>
+  <div class="deco-flower left" aria-hidden="true">🌻</div>
+  <div class="deco-flower right" aria-hidden="true">🌺</div>
+  <div class="deco-bee one" aria-hidden="true">🐝</div>
+  <div class="deco-bee two" aria-hidden="true">🐝</div>
 
   <div class="page">
     <div class="header">
@@ -220,6 +275,15 @@
           <button type="submit" id="save-profile-btn">💾 Save profile</button>
           <div id="profile-message" class="message" style="text-align: left;"></div>
         </form>
+
+        <!-- Message pour contacter l'admin -->
+        <div class="contact-admin-notice">
+          <span class="icon">💡</span>
+          <div>
+            <strong>Need to change your name or email?</strong><br>
+            For security reasons, these fields are locked. If you need to update them or have any other issue, please contact the admin directly on campus.
+          </div>
+        </div>
       </div>
 
       <!-- Commentaires -->
@@ -299,7 +363,7 @@
       dashboardView.classList.remove("hidden");
       document.getElementById("user-email").textContent = email;
 
-      commentsList.innerHTML = '<p class="loading" style="text-align:center;">Loading your data...</p>';
+      commentsList.innerHTML = '<p class="loading" style="text-align:center; color: var(--text-muted); font-style: italic;">Loading your data...</p>';
 
       // Récupérer les infos du volontaire
       const { data: volData, error: volError } = await supabaseClient
@@ -403,7 +467,6 @@
         btn.disabled = false;
         btn.textContent = "Reply";
       } else {
-        // Recharger le dashboard
         const { data } = await supabaseClient.auth.getSession();
         showDashboard(data.session.user.email);
       }
