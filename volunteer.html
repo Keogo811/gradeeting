@@ -8,88 +8,226 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* (On réutilise tes variables de couleurs) */
     :root {
       --cream: #FFF8F2; --cream-deep: #FDEFE6; --white: #FFFFFF;
       --rose: #E85D75; --rose-deep: #C73E56; --rose-soft: #FBD5DC;
       --honey: #FFB627; --honey-soft: #FFE4A8; --text: #3D2C2F;
-      --text-muted: #8B7276; --border: #F3E1DA; --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --text-muted: #8B7276; --border: #F3E1DA;
+      --shadow-sm: 0 2px 8px rgba(199, 62, 86, 0.06);
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
       --radius: 16px; --radius-lg: 24px;
     }
     [data-theme="dark"] {
       --cream: #1E1819; --cream-deep: #2A2123; --white: #2E2527;
       --rose: #F07C90; --rose-deep: #E85D75; --rose-soft: #4A2C33;
       --honey: #FFB627; --honey-soft: #4A3A1E; --text: #F5EBE8;
-      --text-muted: #B8A2A5; --border: #3E2F32; --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --text-muted: #B8A2A5; --border: #3E2F32;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3); --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
     }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
       font-family: 'Nunito', system-ui, sans-serif; background: var(--cream);
       background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
       background-attachment: fixed; color: var(--text); padding: 1.5rem; line-height: 1.6; min-height: 100vh;
     }
-    .page { max-width: 800px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
-    .header h1 { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 2rem; color: var(--rose-deep); }
-    .back-home { display: inline-block; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; margin-bottom: 1rem; }
+
+    /* Rayons de soleil */
+    .sun-rays {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      width: 200vmax; height: 200vmax; pointer-events: none; z-index: 0;
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(255, 182, 39, 0.09) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.06) 13deg, transparent 16deg);
+      -webkit-mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      mask-image: radial-gradient(ellipse 60% 90% at 50% 0%, black 0%, rgba(0,0,0,0.6) 35%, transparent 75%);
+      opacity: 0.85;
+    }
+    [data-theme="dark"] .sun-rays {
+      background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(232, 93, 117, 0.07) 3deg, transparent 6deg, transparent 10deg, rgba(255, 182, 39, 0.05) 13deg, transparent 16deg);
+      opacity: 0.7;
+    }
+
+    .page { max-width: 850px; margin: 0 auto; position: relative; z-index: 1; }
     
-    .card { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border-top: 6px solid var(--honey); }
+    .header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
+    .header h1 { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 2.2rem; color: var(--rose-deep); margin-bottom: 0.3rem; }
+    .header p { color: var(--text-muted); font-family: 'Fredoka', sans-serif; }
+    
+    .back-home { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; font-weight: 500; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; margin-bottom: 1rem; box-shadow: var(--shadow-sm); transition: all 0.15s; }
+    .back-home:hover { background: var(--rose-soft); transform: translateX(-2px); }
+
+    .card { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border-top: 6px solid var(--rose); margin-bottom: 2rem; }
     .hidden { display: none !important; }
     
-    label { display: block; font-family: 'Fredoka', sans-serif; margin-bottom: 0.4rem; font-weight: 500; }
-    input[type="email"] { width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 1rem; background: var(--cream); }
-    button { background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 1rem; }
-    button:hover { opacity: 0.9; }
+    /* Formulaires */
+    label { display: block; font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 0.9rem; margin-bottom: 0.4rem; color: var(--text); }
+    input[type="text"], input[type="email"], input[type="url"], textarea, select {
+      width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px;
+      font-family: inherit; font-size: 0.95rem; background: var(--cream); color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-soft); background: var(--white); }
+    input:disabled { background: #eaeaea; cursor: not-allowed; color: #888; }
+    [data-theme="dark"] input:disabled { background: #1a1516; color: #666; }
     
-    .message { margin-top: 1rem; text-align: center; font-size: 0.9rem; }
-    .message.success { color: #2b7a4b; }
-    .message.error { color: var(--rose-deep); }
+    button { 
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%); color: white; 
+      border: none; padding: 0.8rem 1.5rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; 
+      font-weight: 500; font-size: 1rem; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+    button:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
-    /* Dashboard styles */
-    .comment-item { background: var(--cream); padding: 1.2rem; border-radius: 12px; margin-bottom: 1rem; border-left: 4px solid var(--rose-soft); }
-    .comment-sentiment { font-family: 'Fredoka', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .comment-body { font-size: 1rem; margin-bottom: 1rem; }
-    .reply-form { margin-top: 1rem; }
-    .reply-form textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 10px; font-family: inherit; resize: vertical; min-height: 60px; }
-    .reply-form button { width: auto; padding: 0.5rem 1rem; font-size: 0.9rem; margin-top: 0.5rem; }
-    .existing-reply { background: var(--honey-soft); padding: 0.8rem; border-radius: 8px; border-left: 4px solid var(--honey); font-size: 0.9rem; margin-top: 1rem; }
+    .message { margin-top: 1rem; text-align: center; font-size: 0.9rem; }
+    .message.success { color: #2b7a4b; font-weight: 600; }
+    .message.error { color: var(--rose-deep); font-weight: 600; }
+
+    /* Dashboard - Header */
+    .dash-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-top-color: var(--honey); }
+    .dash-header h2 { font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--rose-deep); margin-bottom: 0.2rem; }
+    .logout-btn { width: auto; background: var(--rose-soft); color: var(--rose-deep); border: 2px solid var(--rose); padding: 0.5rem 1rem; font-size: 0.9rem; }
+
+    /* Métriques */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .metric-card { background: var(--white); padding: 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); text-align: center; border-top: 4px solid var(--honey); }
+    .metric-value { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 2rem; color: var(--rose-deep); line-height: 1; margin-bottom: 0.4rem; }
+    .metric-label { font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Section Profil */
+    .section-title { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.2rem; color: var(--text); margin-bottom: 1rem; border-bottom: 2px dashed var(--rose-soft); padding-bottom: 0.5rem; }
+    
+    /* Commentaires */
+    .comment-item { background: var(--white); padding: 1.2rem 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 1rem; border-left: 5px solid var(--honey-soft); }
+    .comment-sentiment { font-family: 'Fredoka', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; letter-spacing: 0.05em; }
+    .comment-sentiment.positive { color: #2b7a4b; }
+    .comment-sentiment.negative { color: var(--rose-deep); }
+    .comment-body { font-size: 1rem; margin-bottom: 1rem; color: var(--text); }
+    
+    .reply-form textarea { min-height: 70px; resize: vertical; margin-bottom: 0.5rem; }
+    .reply-form button { width: auto; padding: 0.5rem 1.2rem; font-size: 0.9rem; }
+    
+    .existing-reply { background: var(--honey-soft); padding: 1rem; border-radius: 10px; border-left: 4px solid var(--honey); font-size: 0.95rem; margin-top: 1rem; color: #4a2c00; }
+    [data-theme="dark"] .existing-reply { background: #4A3A1E; color: #F5EBE8; border-left-color: var(--honey); }
+    .existing-reply strong { display: block; font-family: 'Fredoka', sans-serif; margin-bottom: 0.2rem; }
+
+    @media (max-width: 600px) {
+      .card { padding: 1.5rem; }
+      .dash-header { flex-direction: column; text-align: center; }
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
+  <div class="sun-rays" aria-hidden="true"></div>
+
   <div class="page">
     <div class="header">
       <a href="index.html" class="back-home">← Back to Gradeeting</a>
       <h1>🌸 Volunteer Hub</h1>
-      <p style="color: var(--text-muted);">Log in to see and reply to your comments</p>
+      <p>Manage your profile and reply to your comments</p>
     </div>
 
-    <!-- Vue 1 : Connexion -->
-    <div id="login-view" class="card">
-      <h2 style="font-family: Fredoka; color: var(--rose-deep); margin-bottom: 1rem;">Sign in</h2>
-      <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Enter the email address you used during your volunteer registration. We will send you a Magic Link to log in instantly.</p>
+    <!-- VUE 1 : CONNEXION -->
+    <div id="login-view" class="card hidden">
+      <h2 class="section-title">Sign in</h2>
+      <p style="margin-bottom: 1.5rem; font-size: 0.95rem; color: var(--text-muted);">Enter the email address you used during your registration. We will send you a Magic Link to log in instantly, no password needed.</p>
       
       <form id="login-form">
         <label>Email address</label>
-        <input type="email" id="email-input" required placeholder="your.email@aivancity.education">
-        <button type="submit" id="login-btn">Send Magic Link</button>
+        <input type="email" id="email-input" required placeholder="your.email@aivancity.education" style="margin-bottom: 1rem;">
+        <button type="submit" id="login-btn" style="width: 100%;">✨ Send Magic Link</button>
       </form>
       <div id="login-message" class="message"></div>
     </div>
 
-    <!-- Vue 2 : Dashboard (caché au début) -->
+    <!-- VUE 2 : DASHBOARD -->
     <div id="dashboard-view" class="hidden">
-      <div class="card" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+      
+      <!-- Header du dashboard -->
+      <div class="card dash-header">
         <div>
-          <h2 style="font-family: Fredoka; color: var(--rose-deep);">Welcome!</h2>
-          <p style="font-size: 0.9rem; color: var(--text-muted);">You are logged in as <span id="user-email" style="font-weight: bold;"></span></p>
+          <h2>Welcome back! 👋</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Logged in as <strong id="user-email" style="color: var(--rose-deep);"></strong></p>
         </div>
-        <button id="logout-btn" style="width: auto; background: var(--rose-soft); color: var(--rose-deep); border: 2px solid var(--rose);">Log out</button>
+        <button id="logout-btn" class="logout-btn">Log out</button>
       </div>
 
-      <h3 style="font-family: Fredoka; margin-bottom: 1rem;">Your comments</h3>
-      <div id="comments-list">
-        <!-- Les commentaires vont s'afficher ici -->
+      <!-- Métriques -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value" id="metric-total">0</div>
+          <div class="metric-label">Total Comments</div>
+        </div>
+        <div class="metric-card" style="border-top-color: #2b7a4b;">
+          <div class="metric-value" id="metric-replied">0</div>
+          <div class="metric-label">Replies Sent</div>
+        </div>
+        <div class="metric-card" style="border-top-color: var(--rose-deep);">
+          <div class="metric-value" id="metric-pending">0</div>
+          <div class="metric-label">Awaiting Reply</div>
+        </div>
       </div>
+
+      <!-- Formulaire de profil -->
+      <div class="card">
+        <h3 class="section-title">✏️ Edit my profile</h3>
+        <form id="profile-form">
+          <div style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin-bottom: 1rem;">
+            <div>
+              <label>Name (Locked)</label>
+              <input type="text" id="edit-name" disabled>
+            </div>
+            <div>
+              <label>Email (Locked)</label>
+              <input type="email" id="edit-email" disabled>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin-bottom: 1rem;">
+            <div>
+              <label>Class</label>
+              <input type="text" id="edit-class" placeholder="e.g. PGE2 EN">
+            </div>
+            <div>
+              <label>Pronouns</label>
+              <select id="edit-pronouns">
+                <option value="">—</option>
+                <option value="he">he</option>
+                <option value="she">she</option>
+                <option value="?">?</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Description</label>
+          <textarea id="edit-description" placeholder="A few words about you..." style="min-height: 80px; margin-bottom: 1rem;"></textarea>
+
+          <div style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin-bottom: 1rem;">
+            <div>
+              <label>Instagram</label>
+              <input type="text" id="edit-instagram" placeholder="Username">
+            </div>
+            <div>
+              <label>Snapchat</label>
+              <input type="text" id="edit-snapchat" placeholder="Username">
+            </div>
+          </div>
+
+          <label>LinkedIn URL</label>
+          <input type="url" id="edit-linkedin" placeholder="https://linkedin.com/in/..." style="margin-bottom: 1.5rem;">
+
+          <button type="submit" id="save-profile-btn">💾 Save profile</button>
+          <div id="profile-message" class="message" style="text-align: left;"></div>
+        </form>
+      </div>
+
+      <!-- Commentaires -->
+      <h3 class="section-title">💬 Your comments</h3>
+      <div id="comments-list">
+        <!-- Rempli par JS -->
+      </div>
+
     </div>
   </div>
 
@@ -99,24 +237,29 @@
     const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // --- Thème sombre ---
+    const THEME_KEY = "gradeeting_theme";
+    if (localStorage.getItem(THEME_KEY) === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
     const loginView = document.getElementById("login-view");
     const dashboardView = document.getElementById("dashboard-view");
     const loginForm = document.getElementById("login-form");
     const loginMessage = document.getElementById("login-message");
     const commentsList = document.getElementById("comments-list");
 
-    // 1. Vérifier si l'utilisateur est déjà connecté
+    // 1. Vérifier la session au chargement
     async function checkSession() {
       const { data } = await supabaseClient.auth.getSession();
       if (data.session) {
         showDashboard(data.session.user.email);
       } else {
         loginView.classList.remove("hidden");
-        dashboardView.classList.add("hidden");
       }
     }
 
-    // 2. Connexion par Magic Link
+    // 2. Connexion Magic Link
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = document.getElementById("email-input").value.trim();
@@ -132,13 +275,13 @@
       });
 
       btn.disabled = false;
-      btn.textContent = "Send Magic Link";
+      btn.textContent = "✨ Send Magic Link";
 
       if (error) {
         loginMessage.textContent = "Error: " + error.message;
         loginMessage.className = "message error";
       } else {
-        loginMessage.textContent = "✅ Magic link sent! Check your inbox.";
+        loginMessage.textContent = "✅ Magic link sent! Check your inbox (and spam folder).";
         loginMessage.className = "message success";
         loginForm.reset();
       }
@@ -150,27 +293,39 @@
       window.location.reload();
     });
 
-    // 4. Afficher le Dashboard et charger les commentaires
+    // 4. Afficher le Dashboard
     async function showDashboard(email) {
       loginView.classList.add("hidden");
       dashboardView.classList.remove("hidden");
       document.getElementById("user-email").textContent = email;
 
-      commentsList.innerHTML = '<p>Loading your comments...</p>';
+      commentsList.innerHTML = '<p class="loading" style="text-align:center;">Loading your data...</p>';
 
-      // Récupérer l'ID du volontaire via son email
+      // Récupérer les infos du volontaire
       const { data: volData, error: volError } = await supabaseClient
         .from("volunteers")
-        .select("id")
+        .select("id, name, class, pronouns, description, instagram, snapchat, linkedin")
         .eq("contact_email", email)
         .single();
 
       if (volError || !volData) {
-        commentsList.innerHTML = '<p class="message error">No volunteer profile found with this email.</p>';
+        commentsList.innerHTML = '<div class="card" style="border-top-color: var(--rose-deep);"><p class="message error">No volunteer profile found with this email address.</p></div>';
         return;
       }
 
-      // Récupérer tous ses commentaires approuvés
+      // Remplir le formulaire
+      document.getElementById("edit-name").value = volData.name;
+      document.getElementById("edit-email").value = email;
+      document.getElementById("edit-class").value = volData.class || "";
+      document.getElementById("edit-pronouns").value = volData.pronouns || "";
+      document.getElementById("edit-description").value = volData.description || "";
+      document.getElementById("edit-instagram").value = volData.instagram || "";
+      document.getElementById("edit-snapchat").value = volData.snapchat || "";
+      document.getElementById("edit-linkedin").value = volData.linkedin || "";
+      
+      window.currentVolunteerId = volData.id; // Sauvegarde de l'ID
+
+      // Récupérer les commentaires
       const { data: comments, error: comError } = await supabaseClient
         .from("comments")
         .select("id, body, sentiment, reply")
@@ -183,8 +338,18 @@
         return;
       }
 
-      if (comments.length === 0) {
-        commentsList.innerHTML = '<div class="card"><p>You have no approved comments yet.</p></div>';
+      // Calcul des métriques
+      const total = comments.length;
+      const replied = comments.filter(c => c.reply).length;
+      const pending = total - replied;
+      
+      document.getElementById("metric-total").textContent = total;
+      document.getElementById("metric-replied").textContent = replied;
+      document.getElementById("metric-pending").textContent = pending;
+
+      // Affichage des commentaires
+      if (total === 0) {
+        commentsList.innerHTML = '<div class="card" style="text-align:center; color:var(--text-muted);">You have no approved comments yet.</div>';
         return;
       }
 
@@ -197,19 +362,21 @@
         if (c.reply) {
           replyHtml = `
             <div class="existing-reply">
-              <strong>Your reply:</strong>
+              <strong>🌸 Your reply:</strong>
               <p>${c.reply}</p>
             </div>`;
         } else {
           replyHtml = `
             <div class="reply-form">
-              <textarea id="reply-text-${c.id}" placeholder="Write a reply..."></textarea>
-              <button onclick="submitReply('${c.id}')">Post reply</button>
+              <textarea id="reply-text-${c.id}" placeholder="Write a public reply..."></textarea>
+              <button onclick="submitReply('${c.id}')">Reply</button>
             </div>`;
         }
 
+        const sentimentClass = c.sentiment === 'positive' ? 'positive' : 'negative';
+
         div.innerHTML = `
-          <div class="comment-sentiment">${c.sentiment} comment</div>
+          <div class="comment-sentiment ${sentimentClass}">${c.sentiment} comment</div>
           <div class="comment-body">"${c.body}"</div>
           ${replyHtml}
         `;
@@ -217,14 +384,14 @@
       });
     }
 
-    // 5. Fonction pour soumettre une réponse
+    // 5. Envoyer une réponse
     window.submitReply = async function(commentId) {
       const text = document.getElementById(`reply-text-${commentId}`).value.trim();
       if (!text) return alert("Please write a reply first.");
 
       const btn = event.target;
       btn.disabled = true;
-      btn.textContent = "Posting...";
+      btn.textContent = "Sending...";
 
       const { error } = await supabaseClient
         .from("comments")
@@ -234,16 +401,52 @@
       if (error) {
         alert("Error posting reply: " + error.message);
         btn.disabled = false;
-        btn.textContent = "Post reply";
+        btn.textContent = "Reply";
       } else {
-        alert("✅ Reply posted successfully!");
-        // Recharger la page pour afficher la réponse
+        // Recharger le dashboard
         const { data } = await supabaseClient.auth.getSession();
         showDashboard(data.session.user.email);
       }
     };
 
-    // Lancer la vérification
+    // 6. Sauvegarder le profil
+    document.getElementById("profile-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("save-profile-btn");
+      const msg = document.getElementById("profile-message");
+      
+      btn.disabled = true;
+      btn.textContent = "Saving...";
+      msg.textContent = "";
+
+      const updates = {
+        class: document.getElementById("edit-class").value.trim(),
+        pronouns: document.getElementById("edit-pronouns").value || null,
+        description: document.getElementById("edit-description").value.trim(),
+        instagram: document.getElementById("edit-instagram").value.trim() || null,
+        snapchat: document.getElementById("edit-snapchat").value.trim() || null,
+        linkedin: document.getElementById("edit-linkedin").value.trim() || null,
+      };
+
+      const { error } = await supabaseClient
+        .from("volunteers")
+        .update(updates)
+        .eq("id", window.currentVolunteerId);
+
+      btn.disabled = false;
+      btn.textContent = "💾 Save profile";
+
+      if (error) {
+        msg.textContent = "❌ Error: " + error.message;
+        msg.className = "message error";
+      } else {
+        msg.textContent = "✅ Profile updated successfully!";
+        msg.className = "message success";
+        setTimeout(() => { msg.textContent = ""; }, 3000);
+      }
+    });
+
+    // Lancer
     checkSession();
   </script>
 </body>
