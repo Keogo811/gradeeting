@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volunteer Hub — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* (On réutilise tes variables de couleurs) */
+    :root {
+      --cream: #FFF8F2; --cream-deep: #FDEFE6; --white: #FFFFFF;
+      --rose: #E85D75; --rose-deep: #C73E56; --rose-soft: #FBD5DC;
+      --honey: #FFB627; --honey-soft: #FFE4A8; --text: #3D2C2F;
+      --text-muted: #8B7276; --border: #F3E1DA; --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08);
+      --radius: 16px; --radius-lg: 24px;
+    }
+    [data-theme="dark"] {
+      --cream: #1E1819; --cream-deep: #2A2123; --white: #2E2527;
+      --rose: #F07C90; --rose-deep: #E85D75; --rose-soft: #4A2C33;
+      --honey: #FFB627; --honey-soft: #4A3A1E; --text: #F5EBE8;
+      --text-muted: #B8A2A5; --border: #3E2F32; --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', system-ui, sans-serif; background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed; color: var(--text); padding: 1.5rem; line-height: 1.6; min-height: 100vh;
+    }
+    .page { max-width: 800px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 2rem; padding-top: 1rem; }
+    .header h1 { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 2rem; color: var(--rose-deep); }
+    .back-home { display: inline-block; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; margin-bottom: 1rem; }
+    
+    .card { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border-top: 6px solid var(--honey); }
+    .hidden { display: none !important; }
+    
+    label { display: block; font-family: 'Fredoka', sans-serif; margin-bottom: 0.4rem; font-weight: 500; }
+    input[type="email"] { width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 1rem; background: var(--cream); }
+    button { background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 1rem; }
+    button:hover { opacity: 0.9; }
+    
+    .message { margin-top: 1rem; text-align: center; font-size: 0.9rem; }
+    .message.success { color: #2b7a4b; }
+    .message.error { color: var(--rose-deep); }
+
+    /* Dashboard styles */
+    .comment-item { background: var(--cream); padding: 1.2rem; border-radius: 12px; margin-bottom: 1rem; border-left: 4px solid var(--rose-soft); }
+    .comment-sentiment { font-family: 'Fredoka', sans-serif; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .comment-body { font-size: 1rem; margin-bottom: 1rem; }
+    .reply-form { margin-top: 1rem; }
+    .reply-form textarea { width: 100%; padding: 0.8rem; border: 2px solid var(--border); border-radius: 10px; font-family: inherit; resize: vertical; min-height: 60px; }
+    .reply-form button { width: auto; padding: 0.5rem 1rem; font-size: 0.9rem; margin-top: 0.5rem; }
+    .existing-reply { background: var(--honey-soft); padding: 0.8rem; border-radius: 8px; border-left: 4px solid var(--honey); font-size: 0.9rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <a href="index.html" class="back-home">← Back to Gradeeting</a>
+      <h1>🌸 Volunteer Hub</h1>
+      <p style="color: var(--text-muted);">Log in to see and reply to your comments</p>
+    </div>
+
+    <!-- Vue 1 : Connexion -->
+    <div id="login-view" class="card">
+      <h2 style="font-family: Fredoka; color: var(--rose-deep); margin-bottom: 1rem;">Sign in</h2>
+      <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Enter the email address you used during your volunteer registration. We will send you a Magic Link to log in instantly.</p>
+      
+      <form id="login-form">
+        <label>Email address</label>
+        <input type="email" id="email-input" required placeholder="your.email@aivancity.education">
+        <button type="submit" id="login-btn">Send Magic Link</button>
+      </form>
+      <div id="login-message" class="message"></div>
+    </div>
+
+    <!-- Vue 2 : Dashboard (caché au début) -->
+    <div id="dashboard-view" class="hidden">
+      <div class="card" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="font-family: Fredoka; color: var(--rose-deep);">Welcome!</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">You are logged in as <span id="user-email" style="font-weight: bold;"></span></p>
+        </div>
+        <button id="logout-btn" style="width: auto; background: var(--rose-soft); color: var(--rose-deep); border: 2px solid var(--rose);">Log out</button>
+      </div>
+
+      <h3 style="font-family: Fredoka; margin-bottom: 1rem;">Your comments</h3>
+      <div id="comments-list">
+        <!-- Les commentaires vont s'afficher ici -->
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const loginView = document.getElementById("login-view");
+    const dashboardView = document.getElementById("dashboard-view");
+    const loginForm = document.getElementById("login-form");
+    const loginMessage = document.getElementById("login-message");
+    const commentsList = document.getElementById("comments-list");
+
+    // 1. Vérifier si l'utilisateur est déjà connecté
+    async function checkSession() {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data.session) {
+        showDashboard(data.session.user.email);
+      } else {
+        loginView.classList.remove("hidden");
+        dashboardView.classList.add("hidden");
+      }
+    }
+
+    // 2. Connexion par Magic Link
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email-input").value.trim();
+      const btn = document.getElementById("login-btn");
+      
+      btn.disabled = true;
+      btn.textContent = "Sending...";
+      loginMessage.textContent = "";
+
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email: email,
+        options: { emailRedirectTo: window.location.href }
+      });
+
+      btn.disabled = false;
+      btn.textContent = "Send Magic Link";
+
+      if (error) {
+        loginMessage.textContent = "Error: " + error.message;
+        loginMessage.className = "message error";
+      } else {
+        loginMessage.textContent = "✅ Magic link sent! Check your inbox.";
+        loginMessage.className = "message success";
+        loginForm.reset();
+      }
+    });
+
+    // 3. Déconnexion
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      await supabaseClient.auth.signOut();
+      window.location.reload();
+    });
+
+    // 4. Afficher le Dashboard et charger les commentaires
+    async function showDashboard(email) {
+      loginView.classList.add("hidden");
+      dashboardView.classList.remove("hidden");
+      document.getElementById("user-email").textContent = email;
+
+      commentsList.innerHTML = '<p>Loading your comments...</p>';
+
+      // Récupérer l'ID du volontaire via son email
+      const { data: volData, error: volError } = await supabaseClient
+        .from("volunteers")
+        .select("id")
+        .eq("contact_email", email)
+        .single();
+
+      if (volError || !volData) {
+        commentsList.innerHTML = '<p class="message error">No volunteer profile found with this email.</p>';
+        return;
+      }
+
+      // Récupérer tous ses commentaires approuvés
+      const { data: comments, error: comError } = await supabaseClient
+        .from("comments")
+        .select("id, body, sentiment, reply")
+        .eq("volunteer_id", volData.id)
+        .eq("status", "approved")
+        .order("created_at", { ascending: false });
+
+      if (comError) {
+        commentsList.innerHTML = '<p class="message error">Error loading comments.</p>';
+        return;
+      }
+
+      if (comments.length === 0) {
+        commentsList.innerHTML = '<div class="card"><p>You have no approved comments yet.</p></div>';
+        return;
+      }
+
+      commentsList.innerHTML = "";
+      comments.forEach(c => {
+        const div = document.createElement("div");
+        div.className = "comment-item";
+        
+        let replyHtml = "";
+        if (c.reply) {
+          replyHtml = `
+            <div class="existing-reply">
+              <strong>Your reply:</strong>
+              <p>${c.reply}</p>
+            </div>`;
+        } else {
+          replyHtml = `
+            <div class="reply-form">
+              <textarea id="reply-text-${c.id}" placeholder="Write a reply..."></textarea>
+              <button onclick="submitReply('${c.id}')">Post reply</button>
+            </div>`;
+        }
+
+        div.innerHTML = `
+          <div class="comment-sentiment">${c.sentiment} comment</div>
+          <div class="comment-body">"${c.body}"</div>
+          ${replyHtml}
+        `;
+        commentsList.appendChild(div);
+      });
+    }
+
+    // 5. Fonction pour soumettre une réponse
+    window.submitReply = async function(commentId) {
+      const text = document.getElementById(`reply-text-${commentId}`).value.trim();
+      if (!text) return alert("Please write a reply first.");
+
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = "Posting...";
+
+      const { error } = await supabaseClient
+        .from("comments")
+        .update({ reply: text, replied_at: new Date() })
+        .eq("id", commentId);
+
+      if (error) {
+        alert("Error posting reply: " + error.message);
+        btn.disabled = false;
+        btn.textContent = "Post reply";
+      } else {
+        alert("✅ Reply posted successfully!");
+        // Recharger la page pour afficher la réponse
+        const { data } = await supabaseClient.auth.getSession();
+        showDashboard(data.session.user.email);
+      }
+    };
+
+    // Lancer la vérification
+    checkSession();
+  </script>
+</body>
+</html>

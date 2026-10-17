@@ -470,7 +470,8 @@ async function loadAllVolunteers() {
   const { data, error } = await supabaseClient
     .from("volunteers")
     .select("id, name, class, description, photo_url, status, pronouns, instagram, snapchat, linkedin, contact_email, consent_given, consent_date, created_at")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(0, 999); // Force le chargement de tous les volontaires
 
   if (error) {
     console.error("Erreur chargement volontaires :", error.message);

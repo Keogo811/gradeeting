@@ -4,44 +4,6 @@ const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ---------- Thème clair / sombre ----------
-const THEME_KEY = "gradeeting_theme";
-
-function applyTheme(theme) {
-  if (theme === "dark") {
-    document.documentElement.setAttribute("data-theme", "dark");
-  } else {
-    document.documentElement.removeAttribute("data-theme");
-  }
-  const btn = document.getElementById("theme-toggle");
-  if (btn) {
-    btn.textContent = theme === "dark" ? "☀️" : "🌙";
-  }
-}
-
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-
-  if (saved) {
-    applyTheme(saved);
-  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    applyTheme("dark");
-  } else {
-    applyTheme("light");
-  }
-
-  const btn = document.getElementById("theme-toggle");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-      const next = current === "dark" ? "light" : "dark";
-      localStorage.setItem(THEME_KEY, next);
-      applyTheme(next);
-    });
-  }
-}
-
-initTheme();
 
 // Éléments du DOM
 const listContainer = document.getElementById("volunteers-list");
@@ -264,6 +226,20 @@ function renderVolunteers(volunteers) {
       card.appendChild(classTag);
     }
 
+    // Ajout des icônes sociales
+    const socialDiv = document.createElement("div");
+    socialDiv.className = "card-socials";
+    
+    if (v.instagram) socialDiv.innerHTML += `<a href="https://instagram.com/${v.instagram}" target="_blank" title="Instagram">📸</a>`;
+    if (v.snapchat) socialDiv.innerHTML += `<a href="https://snapchat.com/add/${v.snapchat}" target="_blank" title="Snapchat">👻</a>`;
+    if (v.linkedin) socialDiv.innerHTML += `<a href="${v.linkedin}" target="_blank" title="LinkedIn">💼</a>`;
+    
+    if (socialDiv.innerHTML !== "") {
+      // Empêcher le clic sur les réseaux de déclencher l'ouverture du profil
+      socialDiv.addEventListener("click", (e) => e.stopPropagation());
+      card.appendChild(socialDiv);
+    }
+
     listContainer.appendChild(card);
   });
 }
@@ -325,7 +301,7 @@ async function showVolunteerDetail(volunteerId) {
 
   const { data: comments, error: comError } = await supabaseClient
     .from("comments")
-    .select("id, body, sentiment, explanation, created_at")
+    .select("id, body, sentiment, explanation, created_at, reply, replied_at")
     .eq("volunteer_id", volunteerId)
     .eq("status", "approved")
     .order("created_at", { ascending: false });
@@ -462,6 +438,14 @@ async function showVolunteerDetail(volunteerId) {
       date.className = "date";
       date.textContent = new Date(c.created_at).toLocaleDateString();
       card.appendChild(date);
+
+      // Affichage de la réponse du volontaire si elle existe
+      if (c.reply) {
+        const replyDiv = document.createElement("div");
+        replyDiv.className = "volunteer-reply";
+        replyDiv.innerHTML = `<strong>🌸 Volunteer replied:</strong><p>${escapeHtml(c.reply)}</p>`;
+        card.appendChild(replyDiv);
+      }
 
       // Bloc réactions
       const stats = reactionsByComment[c.id] || { agree: 0, disagree: 0, mine: null };
@@ -1170,57 +1154,7 @@ async function initVisitCounter() {
 
 initVisitCounter();
 
-// 25. Musique de fond
-const MUSIC_KEY = "gradeeting_music_on";
-
-function initBackgroundMusic() {
-  const audio = document.getElementById("bg-music");
-  const btn = document.getElementById("music-toggle");
-  if (!audio || !btn) return;
-
-  function updateUI(playing) {
-    btn.textContent = playing ? "🔊" : "🔇";
-    btn.classList.toggle("playing", playing);
-    btn.setAttribute("aria-label", playing ? "Pause music" : "Play music");
-  }
-
-  // Restaurer la préférence
-  const wantsMusic = localStorage.getItem(MUSIC_KEY) === "on";
-
-  // Le navigateur exige un clic pour démarrer l'audio.
-  // Si l'utilisateur avait activé la musique, on tente de la relancer
-  // au premier clic n'importe où sur la page.
-  function armAutoRestart() {
-    if (!wantsMusic) return;
-    const tryPlay = () => {
-      audio.play().then(() => {
-        updateUI(true);
-        document.removeEventListener("click", tryPlay);
-      }).catch(() => {});
-    };
-    document.addEventListener("click", tryPlay, { once: true });
-  }
-
-  btn.addEventListener("click", () => {
-    if (audio.paused) {
-      audio.play().then(() => {
-        updateUI(true);
-        localStorage.setItem(MUSIC_KEY, "on");
-      }).catch((err) => {
-        console.error("Erreur lecture audio :", err);
-      });
-    } else {
-      audio.pause();
-      updateUI(false);
-      localStorage.setItem(MUSIC_KEY, "off");
-    }
-  });
-
-  updateUI(false);
-  armAutoRestart();
-}
-
-initBackgroundMusic();
+// 25. Musique de fond effacé dans nouveau sprint
 
 // 26. Bouton de suggestion
 const suggestFab = document.getElementById("suggest-fab");
@@ -1345,5 +1279,209 @@ if (menuToggle && menuDropdown) {
   });
 }
 
+// ==========================================
+// 31. PANNEAU DE PERSONNALISATION (THÈME, MUSIQUE, TAILLE)
+// ==========================================
+
+const customizeFab = document.getElementById("customize-fab");
+const customizePanel = document.getElementById("customize-panel");
+const closeCustomize = document.getElementById("close-customize");
+const themeToggle = document.getElementById("theme-toggle");
+const musicToggle = document.getElementById("music-toggle");
+
+// Ouvrir / Fermer le panneau
+customizeFab.addEventListener("click", () => customizePanel.classList.toggle("hidden"));
+closeCustomize.addEventListener("click", () => customizePanel.classList.add("hidden"));
+
+// --- 1. Thème ---
+const THEME_KEY = "gradeeting_theme";
+
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+    if(themeToggle) themeToggle.textContent = "☀️ Light Mode";
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+    if(themeToggle) themeToggle.textContent = "🌙 Dark Mode";
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) {
+    applyTheme(saved);
+  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    applyTheme("dark");
+  } else {
+    applyTheme("light");
+  }
+}
+
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    const next = current === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_KEY, next);
+    applyTheme(next);
+  });
+}
+initTheme();
+
+// --- 2. Musique ---
+const MUSIC_KEY = "gradeeting_music_on";
+const MUSIC_TRACK_KEY = "gradeeting_music_track";
+const musicSelect = document.getElementById("music-select");
+
+// Sécurité : on récupère l'audio, et si on ne le trouve pas, on le crée !
+let audio = document.getElementById("bg-music");
+if (!audio) {
+  audio = new Audio();
+  audio.id = "bg-music";
+  audio.loop = true;
+  audio.preload = "auto";
+  document.body.appendChild(audio);
+}
+
+// Charger la piste sauvegardée ou celle par défaut
+const savedTrack = localStorage.getItem(MUSIC_TRACK_KEY) || "music/musique.mp3";
+if (musicSelect) {
+  musicSelect.value = savedTrack;
+}
+if (audio) {
+  audio.src = savedTrack;
+}
+
+function updateMusicUI(playing) {
+  if(!musicToggle) return;
+  musicToggle.textContent = playing ? "🔊 Pause Music" : "🔇 Play Music";
+}
+
+if (musicToggle) {
+  musicToggle.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play().then(() => {
+        updateMusicUI(true);
+        localStorage.setItem(MUSIC_KEY, "on");
+      }).catch((err) => {
+        console.error("Erreur audio:", err);
+        alert("Erreur de lecture : le fichier musique.mp3 est introuvable ou corrompu.");
+      });
+    } else {
+      audio.pause();
+      updateMusicUI(false);
+      localStorage.setItem(MUSIC_KEY, "off");
+    }
+  });
+  
+  // Mettre à jour le bouton au chargement
+  updateMusicUI(false);
+}
+
+// Changer de musique via le menu déroulant
+if (musicSelect && audio) {
+  musicSelect.addEventListener("change", (e) => {
+    const selectedTrack = e.target.value;
+    localStorage.setItem(MUSIC_TRACK_KEY, selectedTrack);
+    
+    // Si on choisit "No Music"
+    if (selectedTrack === "none") {
+      audio.pause();
+      updateMusicUI(false);
+      return;
+    }
+
+    // Sinon on change la source
+    const wasPlaying = !audio.paused;
+    audio.src = selectedTrack;
+    audio.load();
+    
+    // Si la musique jouait déjà, on relance la nouvelle
+    if (wasPlaying) {
+      audio.play().catch(err => console.error("Audio error:", err));
+    }
+  });
+}
+
+// --- 3. Taille du texte ---
+const SIZE_KEY = "gradeeting_text_size";
+const sizeBtns = document.querySelectorAll(".size-btn");
+
+function applyTextSize(size) {
+  document.documentElement.classList.remove("text-size-small", "text-size-large");
+  if (size === "small") document.documentElement.classList.add("text-size-small");
+  if (size === "large") document.documentElement.classList.add("text-size-large");
+  
+  sizeBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.size === size);
+  });
+}
+
+sizeBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const size = btn.dataset.size;
+    localStorage.setItem(SIZE_KEY, size);
+    applyTextSize(size);
+  });
+});
+applyTextSize(localStorage.getItem(SIZE_KEY) || "normal");
+
+// --- 4. Largeur de la page ---
+const WIDTH_KEY = "gradeeting_page_width";
+const widthBtns = document.querySelectorAll(".width-btn");
+
+function applyWidth(width) {
+  if (width === "wide") document.body.classList.add("page-width-wide");
+  else document.body.classList.remove("page-width-wide");
+  
+  widthBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.width === width);
+  });
+}
+
+widthBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const width = btn.dataset.width;
+    localStorage.setItem(WIDTH_KEY, width);
+    applyWidth(width);
+  });
+});
+applyWidth(localStorage.getItem(WIDTH_KEY) || "normal");
+
 // 29. Année dynamique dans le footer
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// 32. Jeu de Matchmaking (Aléatoire)
+const matchBtn = document.getElementById("match-btn");
+const matchCard = document.getElementById("match-card");
+
+if (matchBtn && matchCard) {
+  matchBtn.addEventListener("click", () => {
+    if (!allVolunteers || allVolunteers.length === 0) return;
+    
+    // Animation de chargement
+    matchBtn.disabled = true;
+    matchBtn.textContent = "Drawing...";
+    matchCard.innerHTML = "<p>🎲...</p>";
+
+    setTimeout(() => {
+      const randomVol = allVolunteers[Math.floor(Math.random() * allVolunteers.length)];
+      const photo = randomVol.photo_url || PLACEHOLDER;
+      
+      matchCard.innerHTML = `
+        <div class="match-result">
+          <img src="${photo}" class="match-photo" alt="${randomVol.name}" onerror="this.src='${PLACEHOLDER}'">
+          <div class="match-name">${escapeHtml(randomVol.name)}</div>
+          <div class="match-class">${escapeHtml(normalizeClass(randomVol.class) || "")}</div>
+          <button class="match-profile-btn" id="goto-match">Click then look up for profile</button>
+        </div>
+      `;
+
+      document.getElementById("goto-match").addEventListener("click", () => {
+        showVolunteerDetail(randomVol.id);
+      });
+
+      matchBtn.disabled = false;
+      matchBtn.textContent = "🎲 Draw another";
+    }, 600); // Petit délai pour le suspense
+  });
+}

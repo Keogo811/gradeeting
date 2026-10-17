@@ -46,8 +46,6 @@
         <a href="qr.html" class="menu-item">📱 QR Code</a>
       </div>
     </div>
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" type="button">🌙</button>
-    <button id="music-toggle" class="music-toggle" aria-label="Toggle music" type="button">🔇</button>
     <h1>GRADEETING</h1>
     <p class="tagline">✨ Discover the stars of Aivancity ✨</p>
     <nav class="header-nav">
@@ -145,6 +143,18 @@
 
         <button id="memory-reset" class="game-btn" type="button">🔄 New game</button>
         <p class="game-score">Pairs found: <strong id="memory-pairs">0</strong> / 4</p>
+      </div>
+
+      <!-- Matchmaking -->
+      <div class="game-card">
+        <h3>🎲 Campus Match</h3>
+        <p class="game-subtitle">Discover a random volunteer.</p>
+        
+        <div id="match-card" style="min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <p style="color: var(--text-muted); font-style: italic;">Click below to start!</p>
+        </div>
+
+        <button id="match-btn" class="game-btn" type="button">🎲 Draw a card</button>
       </div>
     </div>
   </section>
@@ -309,7 +319,51 @@
     </div>
   </div>
 
-  <audio id="bg-music" src="cancan.mp3" loop preload="none"></audio>
+  <!-- Bouton de personnalisation (thème, taille, largeur) -->
+  <button id="customize-fab" class="customize-fab" aria-label="Customize display" type="button">⚙️</button>
+
+  <!-- Panneau de personnalisation -->
+  <div id="customize-panel" class="customize-panel hidden">
+    <div class="customize-header">
+      <h3>⚙️ Display settings</h3>
+      <button id="close-customize" class="modal-close" aria-label="Close">×</button>
+    </div>
+    
+    <div class="customize-group">
+      <label>Theme</label>
+      <button id="theme-toggle" class="customize-btn">🌙 Dark Mode</button>
+    </div>
+
+    <div class="customize-group">
+      <label>Music</label>
+      <button id="music-toggle" class="customize-btn" style="margin-bottom: 0.4rem;">🔇 Play Music</button>
+      
+      <select id="music-select" class="customize-btn" style="padding: 0.5rem; font-size: 0.8rem;">
+        <option value="music/musique.mp3">🎵 Can-Can (Default)</option>
+        <option value="music/german.mp3">🎧 Lofi German</option>
+        <option value="music/mongol.mp3">🐎 Mongol Throats</option>
+        <option value="music/russian.mp3">🌿 Russian Sounds</option>
+        <option value="none">🔇 No Music</option>
+      </select>
+    </div>
+
+    <div class="customize-group">
+      <label>Text Size</label>
+      <div class="size-buttons">
+        <button class="size-btn" data-size="small">A-</button>
+        <button class="size-btn active" data-size="normal">A</button>
+        <button class="size-btn" data-size="large">A+</button>
+      </div>
+    </div>
+
+    <div class="customize-group">
+      <label>Page Width</label>
+      <div class="size-buttons">
+        <button class="width-btn" data-width="normal">Normal</button>
+        <button class="width-btn" data-width="wide">Full</button>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
