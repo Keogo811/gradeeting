@@ -706,6 +706,20 @@ signupForm.addEventListener("submit", async (e) => {
     return;
   }
 
+  // Validation de la taille (max 5 Mo)
+  if (photoFile.size > 5 * 1024 * 1024) {
+    message.textContent = "Your photo is too large (max 5 MB). Please choose a smaller one.";
+    message.classList.add("error");
+    return;
+  }
+
+  // Validation du type de fichier (images uniquement)
+  if (!photoFile.type.startsWith("image/")) {
+    message.textContent = "Only image files are allowed (JPG, PNG, etc.).";
+    message.classList.add("error");
+    return;
+  }
+
   submitBtn.disabled = true;
   submitBtn.textContent = "Uploading...";
 
