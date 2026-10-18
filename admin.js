@@ -469,7 +469,7 @@ async function loadAllVolunteers() {
 
   const { data, error } = await supabaseClient
     .from("volunteers")
-    .select("id, name, class, description, photo_url, status, pronouns, instagram, snapchat, linkedin, contact_email, consent_given, consent_date, created_at")
+    .select("id, name, class, description, photo_url, status, pronouns, instagram, snapchat, linkedin, contact_email, consent_given, consent_date, created_at, access_token")
     .order("created_at", { ascending: false })
     .range(0, 999); // Force le chargement de tous les volontaires
 
@@ -555,6 +555,12 @@ function openEditVolunteerModal(volunteer) {
 
   editModalBody.innerHTML = `
     <h2>Edit volunteer</h2>
+    
+    <!-- BOUTON MAGIQUE -->
+    <div style="background: var(--honey-soft); padding: 0.8rem; border-radius: 10px; margin-bottom: 1rem;">
+      <button type="button" onclick="copyLoginLink('${volunteer.access_token}')" style="background: var(--honey); color: #4a2c00; border: none; padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">🔗 Copy Login Link</button>
+      <span style="font-size: 0.8rem; margin-left: 0.5rem; color: #6b4a00;">Send this to the volunteer</span>
+    </div>
 
     <label>Name</label>
     <input type="text" id="edit-name" maxlength="80" value="${escapeAttr(volunteer.name)}">
@@ -1399,6 +1405,19 @@ document.getElementById("export-volunteers").addEventListener("click", () => {
   link.click();
   document.body.removeChild(link);
 });
+
+// 33. Copier le lien de connexion
+window.copyLoginLink = function(token) {
+  // Détecte si on est sur Live Server ou en prod pour créer la bonne URL
+  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+  const url = `${baseUrl}volunteer.html?token=${token}`;
+  
+  navigator.clipboard.writeText(url).then(() => {
+    alert("✅ Link copied to clipboard!\n\nSend it to the volunteer via WhatsApp.");
+  }).catch(err => {
+    prompt("Copy this link manually:", url);
+  });
+};
 
 // 7. Lancer au chargement
 checkSession();
