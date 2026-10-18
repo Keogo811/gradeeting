@@ -2889,8 +2889,27 @@ body {
 
 .game-promo {
   position: absolute;
-  top: 8rem;
-  right: 10%; /* Placé vers la droite mais décalé du bord */
+  top: 9rem;
+  right: 11%; /* Placé vers la droite mais décalé du bord */
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, var(--honey) 0%, var(--rose) 100%);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 8px 25px rgba(232, 93, 117, 0.4);
+  border: 3px solid var(--white);
+  z-index: 100;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: promo-bounce 3s ease-in-out infinite;
+}
+
+.game-promo1 {
+  position: absolute;
+  top: 9rem;
+  left: 11%; /* Placé vers la droite mais décalé du bord */
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -2907,6 +2926,12 @@ body {
 }
 
 .game-promo:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(232, 93, 117, 0.6);
+  animation: none; /* Stoppe le rebond au survol */
+}
+
+.game-promo1:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 12px 30px rgba(232, 93, 117, 0.6);
   animation: none; /* Stoppe le rebond au survol */

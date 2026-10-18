@@ -1104,7 +1104,7 @@ function initMemoryGame() {
 initMemoryGame();
 
 // 23. Bandeau d'annonce dismissible
-const ANNOUNCEMENT_VERSION = "v33"; // Change cette valeur pour réafficher le bandeau à tout le monde
+const ANNOUNCEMENT_VERSION = "v36"; // Change cette valeur pour réafficher le bandeau à tout le monde
 const ANNOUNCEMENT_KEY = "gradeeting_announcement_dismissed";
 
 function initAnnouncement() {
