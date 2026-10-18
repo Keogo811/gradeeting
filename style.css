@@ -2883,6 +2883,83 @@ body {
   }
 }
 
+/* =========================================
+   PROMO BANNER - SWIPE & MEET
+   ========================================= */
+
+.game-promo {
+  position: absolute;
+  top: 8rem;
+  right: 10%; /* Placé vers la droite mais décalé du bord */
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: linear-gradient(135deg, var(--honey) 0%, var(--rose) 100%);
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 8px 25px rgba(232, 93, 117, 0.4);
+  border: 3px solid var(--white);
+  z-index: 100;
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: promo-bounce 3s ease-in-out infinite;
+}
+
+.game-promo:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(232, 93, 117, 0.6);
+  animation: none; /* Stoppe le rebond au survol */
+}
+
+.promo-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.promo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+  font-family: 'Fredoka', sans-serif;
+}
+
+.promo-text strong {
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.promo-text span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Animation pour attirer l'œil */
+@keyframes promo-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(232, 93, 117, 0.5); }
+}
+
+/* Adaptation pour mobile et petits écrans */
+@media (max-width: 900px) {
+  .game-promo {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 1.5rem auto 0 auto;
+    width: fit-content;
+    animation: none; /* Moins distrayant sur mobile */
+  }
+}
+
+[data-theme="dark"] .game-promo {
+  border-color: var(--border); /* Bordure plus sombre en mode nuit */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
 /* ---------- Compteur de visites ---------- */
 .visit-count {
   margin-top: 0.3rem;

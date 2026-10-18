@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swipe & Meet — GRADEETING</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FFF8F2; --cream-deep: #FDEFE6; --white: #FFFFFF;
+      --rose: #E85D75; --rose-deep: #C73E56; --rose-soft: #FBD5DC;
+      --honey: #FFB627; --honey-soft: #FFE4A8; --text: #3D2C2F;
+      --text-muted: #8B7276; --border: #F3E1DA;
+      --shadow-md: 0 4px 16px rgba(199, 62, 86, 0.08); --shadow-lg: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    [data-theme="dark"] {
+      --cream: #1E1819; --cream-deep: #2A2123; --white: #2E2527;
+      --rose: #F07C90; --rose-deep: #E85D75; --rose-soft: #4A2C33;
+      --honey: #FFB627; --honey-soft: #4A3A1E; --text: #F5EBE8;
+      --text-muted: #B8A2A5; --border: #3E2F32; --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Nunito', system-ui, sans-serif; background: var(--cream);
+      background-image: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+      background-attachment: fixed; color: var(--text); height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+
+    /* --- Décorations Fixes Gauche/Droite (NOPE / LIKE) --- */
+    .side-bg {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 1; pointer-events: none; opacity: 0.7; /* Beaucoup plus visible */
+    }
+    .side-bg.left { left: 5%; color: var(--rose-deep); }
+    .side-bg.right { right: 5%; color: #2b7a4b; }
+    .side-icon { font-size: 8rem; line-height: 1; margin-bottom: 1rem; filter: drop-shadow(0 0 15px rgba(0,0,0,0.1)); }
+    .side-text { font-family: 'Fredoka', sans-serif; font-size: 4rem; font-weight: 700; letter-spacing: 8px; transform: rotate(-90deg); margin-top: 3rem; opacity: 0.5; }
+    
+    [data-theme="dark"] .side-bg.left { color: var(--rose); }
+    [data-theme="dark"] .side-bg.right { color: #74c78d; }
+
+    /* --- Nouvelles Décorations Fixes (Non-effacées) --- */
+    .fixed-deco { position: fixed; z-index: 5; pointer-events: none; font-size: 3rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); animation: float-bee 4s ease-in-out infinite; }
+    .fixed-deco.bee1 { top: 10%; left: 15%; animation-delay: 0s; }
+    .fixed-deco.bee2 { bottom: 15%; right: 15%; animation-delay: -1.5s; font-size: 2rem; }
+    .fixed-deco.flower1 { bottom: 10%; left: 8%; font-size: 4rem; animation: breathe 3s infinite alternate; }
+    .fixed-deco.flower2 { top: 12%; right: 10%; font-size: 3.5rem; animation: breathe 3s infinite alternate-reverse; }
+    @keyframes float-bee { 0%, 100% { transform: translateY(0) rotate(5deg); } 50% { transform: translateY(-15px) rotate(-5deg); } }
+    @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+    /* --- Arrière-plan Fun (Cœurs & Croix flottants) --- */
+    .bg-decorations { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-icon { position: absolute; opacity: 0.15; font-size: 3rem; animation: floatBg 15s linear infinite; }
+    [data-theme="dark"] .bg-icon { opacity: 0.08; }
+    @keyframes floatBg { 0% { transform: translateY(110vh) rotate(0deg) scale(1); } 100% { transform: translateY(-10vh) rotate(360deg) scale(1.5); } }
+
+    .back-home { position: absolute; top: 1.5rem; left: 1.5rem; display: inline-flex; align-items: center; gap: 0.4rem; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; font-weight: 500; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; box-shadow: var(--shadow-md); z-index: 100; }
+    
+    /* --- Instruction Overlay --- */
+    #instructions {
+      position: absolute; inset: 0; background: rgba(30, 24, 25, 0.9); backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 1000; color: white; text-align: center; padding: 2rem; transition: opacity 0.4s;
+    }
+    #instructions h1 { font-family: 'Fredoka', sans-serif; font-size: 2.5rem; color: var(--honey); margin-bottom: 1rem; }
+    #instructions p { font-size: 1.1rem; margin-bottom: 1rem; max-width: 400px; line-height: 1.6; }
+    #instructions .gestures { font-size: 1.8rem; margin: 1.5rem 0; display: flex; gap: 2rem; }
+    #instructions .start-btn { background: var(--rose); color: white; border: none; padding: 1rem 2rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(232, 93, 117, 0.4); margin-top: 1rem; }
+    #instructions .start-btn:hover { transform: scale(1.05); }
+
+    /* --- Jeu --- */
+    .game-container { 
+      position: relative; 
+      width: 100%; 
+      max-width: 340px; 
+      height: clamp(340px, 55vh, 480px);
+      z-index: 10;
+    }
+    
+    .card {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(180deg, var(--white) 0%, var(--rose-soft) 100%);
+      border-radius: 24px; box-shadow: var(--shadow-lg);
+      overflow: hidden; display: flex; flex-direction: column;
+      border: 2px solid rgba(255,255,255,0.5); cursor: grab;
+      transform-origin: center bottom; 
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+    }
+    [data-theme="dark"] .card { background: linear-gradient(180deg, var(--white) 0%, #4A2C33 100%); border-color: rgba(255,255,255,0.1); }
+    
+    .card:active { cursor: grabbing; }
+    .card img { width: 100%; height: 60%; object-fit: cover; pointer-events: none; background: var(--cream-deep); transition: filter 0.3s ease; }
+    
+    .card-info { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: center; transition: background 0.3s; }
+    .card-name { font-family: 'Fredoka', sans-serif; font-size: 1.8rem; color: var(--rose-deep); margin-bottom: 0.2rem; }
+    [data-theme="dark"] .card-name { color: var(--honey); }
+    .card-class { font-size: 0.95rem; color: var(--text-muted); font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+    .card-desc { font-size: 0.95rem; color: var(--text); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+
+    /* --- Mode Blind Date --- */
+    .card.blind-mode img { filter: blur(20px) scale(1.1); }
+    .card.blind-mode .card-info { background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); height: 100%; justify-content: flex-end; padding-bottom: 3rem; }
+    .card.blind-mode .card-name { color: var(--honey); }
+    .card.blind-mode .card-class { color: #ccc; }
+    .card.blind-mode .card-desc { color: white; font-size: 1.1rem; }
+
+    .overlay { position: absolute; top: 40px; font-family: 'Fredoka', sans-serif; font-size: 3rem; font-weight: 700; padding: 0.5rem 1.5rem; border-radius: 12px; border: 5px solid; opacity: 0; pointer-events: none; z-index: 2; text-transform: uppercase; }
+    .overlay.like { left: 20px; color: #2b7a4b; border-color: #2b7a4b; transform: rotate(-15deg); }
+    .overlay.nope { right: 20px; color: var(--rose-deep); border-color: var(--rose-deep); transform: rotate(15deg); }
+
+    /* --- Boutons d'action --- */
+    .actions { display: flex; gap: 1.5rem; margin-top: 1.5rem; z-index: 10; align-items: center; flex-shrink: 0; }
+    .action-btn { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--white); box-shadow: var(--shadow-lg); font-size: 1.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
+    .action-btn:hover { transform: scale(1.1); }
+    .action-btn.nope { color: var(--rose-deep); border: 3px solid var(--rose-soft); }
+    .action-btn.like { color: #2b7a4b; border: 3px solid #e6f4ea; }
+    .action-btn.blind { width: 50px; height: 50px; font-size: 1.4rem; opacity: 0.6; border: 2px solid var(--border); }
+    .action-btn.blind.active { opacity: 1; background: var(--honey-soft); border-color: var(--honey); transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 182, 39, 0.5); }
+
+    .particle { position: absolute; font-size: 2rem; pointer-events: none; z-index: 100; animation: floatUp 1s ease-out forwards; }
+    @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1.5); opacity: 0; } }
+
+    /* --- Fin de jeu --- */
+    .end-screen { position: absolute; inset: 0; background: rgba(255, 248, 242, 0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; z-index: 50; border-radius: 24px; }
+    [data-theme="dark"] .end-screen { background: rgba(30, 24, 25, 0.95); }
+    .end-screen h2 { font-family: 'Fredoka', sans-serif; color: var(--rose-deep); font-size: 2.2rem; margin-bottom: 1rem; }
+    .end-screen p { margin-bottom: 2rem; color: var(--text-muted); font-size: 1.1rem; }
+    .restart-btn { background: linear-gradient(135deg, var(--honey) 0%, #FF8C42 100%); color: var(--text); border: none; padding: 1rem 2rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4); }
+
+    /* --- Panneau Paramètres --- */
+    .customize-fab { position: absolute; bottom: 1.5rem; right: 1.5rem; width: 50px; height: 50px; border-radius: 50%; background: var(--white); border: 2px solid var(--border); font-size: 1.3rem; cursor: pointer; box-shadow: var(--shadow-md); z-index: 100; display: flex; align-items: center; justify-content: center; }
+    .customize-panel { position: absolute; bottom: 5rem; right: 1.5rem; width: 240px; background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 1rem; z-index: 100; border: 2px solid var(--border); display: none; }
+    .customize-panel.active { display: block; animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .customize-panel button, .customize-panel select { width: 100%; padding: 0.6rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid var(--border); background: var(--cream); font-family: inherit; font-size: 0.95rem; cursor: pointer; color: var(--text); }
+    .customize-panel button { display: flex; justify-content: space-between; font-family: 'Fredoka'; }
+    .customize-panel button:hover { background: var(--rose-soft); }
+
+    /* Cache les décorations latérales sur mobile */
+    @media (max-width: 900px) {
+      .side-bg, .fixed-deco { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fond animé (Cœurs et Croix) -->
+  <div class="bg-decorations" id="bg-decorations" aria-hidden="true"></div>
+
+  <!-- Décorations Fixes Latérales (NOPE / LIKE) -->
+  <div class="side-bg left">
+    <div class="side-icon">❌</div>
+    <div class="side-text">NOPE</div>
+  </div>
+  <div class="side-bg right">
+    <div class="side-icon">❤️</div>
+    <div class="side-text">LIKE</div>
+  </div>
+
+  <!-- Décorations Fixes (Abeilles & Fleurs) -->
+  <div class="fixed-deco bee1">🐝</div>
+  <div class="fixed-deco bee2">🐝</div>
+  <div class="fixed-deco flower1">🐝</div>
+  <div class="fixed-deco flower2">🐝</div>
+
+  <a href="index.html" class="back-home">← Back</a>
+
+  <!-- Écran d'instructions -->
+  <div id="instructions">
+    <h1>Swipe & Meet 🎯</h1>
+    <p>Discover your campus like never before. Swipe the cards to see who you'd like to meet!</p>
+    <div class="gestures">
+      <span style="color: #2b7a4b;">👉 ❤️ Right = Like</span>
+      <span style="color: var(--rose-deep);">👈 ❌ Left = Pass</span>
+    </div>
+    <p style="font-size: 0.9rem; opacity: 0.8;">Use the 👁️ button to better see <strong>Info</strong>.</p>
+    <button class="start-btn" onclick="startGame()">Let's go!</button>
+  </div>
+
+  <div class="game-container" id="game-container">
+    <div class="end-screen hidden" id="end-screen">
+      <h2>That's everyone! 🌸</h2>
+      <p>You liked <strong id="like-count">0</strong> people.<br>Go say hi to them on campus!</p>
+      <button class="restart-btn" onclick="startGame()">Play again</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="action-btn nope" onclick="swipe('left')">❌</button>
+    <button class="action-btn blind" id="blind-btn" onclick="toggleBlind()" title="Toggle Blind Mode">👁️</button>
+    <button class="action-btn like" onclick="swipe('right')">❤️</button>
+  </div>
+
+  <button class="customize-fab" onclick="document.getElementById('custom-panel').classList.toggle('active')">⚙️</button>
+  <div class="customize-panel" id="custom-panel">
+    <button onclick="toggleTheme()">🌙 Theme <span id="theme-status">Dark</span></button>
+    
+    <select id="music-select" style="margin-bottom: 0.5rem;">
+      <option value="music/musique.mp3">🎵 Can-Can (Default)</option>
+      <option value="music/german.mp3">🎧 Lofi German</option>
+      <option value="music/mongol.mp3">🐎 Mongol Throats</option>
+      <option value="music/russian.mp3">🌿 Russian Sounds</option>
+    </select>
+    
+    <button onclick="toggleMusic()">🎵 Music <span id="music-status">Off</span></button>
+  </div>
+
+  <audio id="bg-music" loop></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- Thème ---
+    if (localStorage.getItem("gradeeting_theme") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      document.getElementById("theme-status").textContent = "Light";
+    }
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("gradeeting_theme", "light");
+        document.getElementById("theme-status").textContent = "Dark";
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("gradeeting_theme", "dark");
+        document.getElementById("theme-status").textContent = "Light";
+      }
+    }
+
+    // --- Musique ---
+    const audio = document.getElementById("bg-music");
+    const musicSelect = document.getElementById("music-select");
+    let isPlaying = false;
+
+    const savedTrack = localStorage.getItem("gradeeting_music_track") || "music/musique.mp3";
+    audio.src = savedTrack;
+    musicSelect.value = savedTrack;
+
+    musicSelect.addEventListener("change", (e) => {
+      audio.src = e.target.value;
+      localStorage.setItem("gradeeting_music_track", e.target.value);
+      if (isPlaying) audio.play();
+    });
+
+    function toggleMusic() {
+      if (isPlaying) {
+        audio.pause();
+        document.getElementById("music-status").textContent = "Off";
+      } else {
+        audio.volume = 0.3;
+        audio.play().catch(e => alert("Musique introuvable : " + audio.src));
+        document.getElementById("music-status").textContent = "On";
+      }
+      isPlaying = !isPlaying;
+    }
+
+    // --- Générateur de sons distincts (Swipe) ---
+    function playSound(type) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        const now = ctx.currentTime;
+
+        if (type === "like") {
+          // Son aigu style pièce d'arcade (Mario coin)
+          osc.type = "square"; // Son 8-bit
+          osc.frequency.setValueAtTime(987.77, now); // Note B5
+          osc.frequency.setValueAtTime(1318.51, now + 0.08); // Note E6
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else {
+          // Son grave et agressif de buzzer de jeu télévisé
+          osc.type = "sawtooth"; 
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.setValueAtTime(130, now + 0.15);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        }
+      } catch (e) { console.log("Audio not supported"); }
+    }
+
+    // --- Fond animé ---
+    const bg = document.getElementById("bg-decorations");
+    const bgIcons = ["❤️", "❌", "🌸", "✨"];
+    for (let i = 0; i < 20; i++) {
+      const el = document.createElement("div");
+      el.className = "bg-icon";
+      el.textContent = bgIcons[Math.floor(Math.random() * bgIcons.length)];
+      el.style.left = `${Math.random() * 100}%`;
+      el.style.animationDuration = `${10 + Math.random() * 10}s`;
+      el.style.animationDelay = `${Math.random() * -15}s`;
+      el.style.fontSize = `${2 + Math.random() * 2}rem`;
+      bg.appendChild(el);
+    }
+
+    // --- Logique du jeu ---
+    const container = document.getElementById("game-container");
+    const endScreen = document.getElementById("end-screen");
+    const instructions = document.getElementById("instructions");
+    const blindBtn = document.getElementById("blind-btn");
+
+    let volunteers = [];
+    let currentIndex = 0;
+    let likedCount = 0;
+    let isBlindMode = false;
+    let isDragging = false;
+    let activeCard = null;
+
+    async function loadData() {
+      const { data, error } = await supabaseClient
+        .from("volunteers")
+        .select("id, name, class, description, photo_url")
+        .eq("status", "approved");
+
+      if (error) return console.error(error);
+      volunteers = data.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+      instructions.style.opacity = "0";
+      setTimeout(() => instructions.style.display = "none", 400);
+      
+      currentIndex = 0;
+      likedCount = 0;
+      endScreen.classList.add("hidden");
+      container.querySelectorAll(".card").forEach(c => c.remove());
+      
+      if (volunteers.length === 0) {
+        loadData().then(loadNextCard);
+      } else {
+        loadNextCard();
+      }
+    }
+
+    function loadNextCard() {
+      if (currentIndex >= volunteers.length) {
+        endScreen.classList.remove("hidden");
+        document.getElementById("like-count").textContent = likedCount;
+        return;
+      }
+
+      const vol = volunteers[currentIndex];
+      activeCard = document.createElement("div");
+      activeCard.className = "card";
+      if (isBlindMode) activeCard.classList.add("blind-mode");
+      
+      const photo = vol.photo_url || "https://placehold.co/400x500?text=No+Photo";
+      
+      activeCard.innerHTML = `
+        <img src="${photo}" draggable="false">
+        <div class="card-info">
+          <div class="card-name">${vol.name}</div>
+          <div class="card-class">${vol.class || ""}</div>
+          <div class="card-desc">${vol.description || ""}</div>
+        </div>
+        <div class="overlay like">LIKE</div>
+        <div class="overlay nope">NOPE</div>
+      `;
+
+      activeCard.style.zIndex = 100 - currentIndex;
+      const offset = Math.min(currentIndex, 3) * 10;
+      const scale = 1 - Math.min(currentIndex, 3) * 0.05;
+      activeCard.style.transform = `translateY(-${offset}px) scale(${scale})`;
+      
+      container.insertBefore(activeCard, container.firstChild);
+      updateStack();
+      setupDrag(activeCard);
+    }
+
+    function updateStack() {
+      const cards = Array.from(container.querySelectorAll(".card"));
+      cards.forEach((c, index) => {
+        const depth = Math.min(index, 3);
+        const offset = depth * 10;
+        const scale = 1 - depth * 0.05;
+        if (!c.classList.contains("dragging")) {
+          c.style.transform = `translateY(-${offset}px) scale(${scale})`;
+          c.style.zIndex = 100 - depth;
+        }
+      });
+    }
+
+    function toggleBlind() {
+      isBlindMode = !isBlindMode;
+      blindBtn.classList.toggle("active", isBlindMode);
+      if (activeCard) {
+        activeCard.classList.toggle("blind-mode");
+      }
+    }
+
+    function setupDrag(card) {
+      let startX = 0, currentX = 0;
+      const likeOverlay = card.querySelector(".overlay.like");
+      const nopeOverlay = card.querySelector(".overlay.nope");
+
+      const onPointerDown = (e) => {
+        if (isDragging || card !== activeCard) return;
+        isDragging = true;
+        startX = e.clientX;
+        card.classList.add("dragging");
+        card.style.transition = "none";
+        card.setPointerCapture(e.pointerId);
+      };
+
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX - startX;
+        const rotate = currentX * 0.08;
+        card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+
+        if (currentX > 20) {
+          likeOverlay.style.opacity = Math.min(currentX / 100, 1);
+          nopeOverlay.style.opacity = 0;
+        } else if (currentX < -20) {
+          nopeOverlay.style.opacity = Math.min(Math.abs(currentX) / 100, 1);
+          likeOverlay.style.opacity = 0;
+        } else {
+          likeOverlay.style.opacity = 0;
+          nopeOverlay.style.opacity = 0;
+        }
+      };
+
+      const onPointerUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        card.classList.remove("dragging");
+        card.style.transition = "transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease";
+
+        if (currentX > 100) {
+          swipeCardOut(card, "right");
+        } else if (currentX < -100) {
+          swipeCardOut(card, "left");
+        } else {
+          const depth = Math.min(currentIndex, 3);
+          card.style.transform = `translateY(-${depth * 10}px) scale(${1 - depth * 0.05})`;
+          likeOverlay.style.opacity = 0;
+          nopeOverlay.style.opacity = 0;
+        }
+        currentX = 0;
+      };
+
+      card.addEventListener("pointerdown", onPointerDown);
+      card.addEventListener("pointermove", onPointerMove);
+      card.addEventListener("pointerup", onPointerUp);
+      card.addEventListener("pointercancel", onPointerUp);
+    }
+
+    function swipe(direction) {
+      if (!activeCard || isDragging) return;
+      swipeCardOut(activeCard, direction);
+    }
+
+    function swipeCardOut(card, direction) {
+      const moveX = direction === "right" ? window.innerWidth : -window.innerWidth;
+      const rotate = direction === "right" ? 30 : -30;
+      
+      card.style.transform = `translateX(${moveX}px) rotate(${rotate}deg)`;
+      card.style.opacity = "0";
+      
+      createParticles(direction);
+      playSound(direction);
+      
+      if (direction === "right") likedCount++;
+      currentIndex++;
+      activeCard = null;
+      
+      setTimeout(() => {
+        card.remove();
+        loadNextCard();
+      }, 400);
+    }
+
+    function createParticles(direction) {
+      const emoji = direction === "right" ? "❤️" : "❌";
+      for (let i = 0; i < 6; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.textContent = emoji;
+        
+        const rect = container.getBoundingClientRect();
+        const startX = rect.left + rect.width / 2;
+        const startY = rect.top + rect.height / 2;
+        
+        particle.style.left = `${startX + (Math.random() * 100 - 50)}px`;
+        particle.style.top = `${startY + (Math.random() * 100 - 50)}px`;
+        particle.style.animationDelay = `${Math.random() * 0.2}s`;
+        particle.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
+        
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
