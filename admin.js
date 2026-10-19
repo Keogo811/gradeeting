@@ -51,23 +51,6 @@ function normalizeClass(input) {
   return s;
 }
 
-// 2.6 Utilitaires
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function escapeAttr(text) {
-  if (!text) return "";
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
 // 3. Vérifier la session au chargement
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
@@ -247,7 +230,7 @@ async function loadPendingVolunteers() {
     card.innerHTML = `
       <div class="admin-card-header">
         <div style="display:flex;gap:1rem;align-items:center;">
-          <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
+          <img class="admin-card-image" src="${escapeAttr(safeUrl(v.photo_url) || PLACEHOLDER)}">
           <div>
             <div class="admin-card-title">${escapeHtml(v.name)}${v.pronouns ? ` <span class="tag tag-pending">${escapeHtml(v.pronouns)}</span>` : ""}</div>
             <div class="admin-card-meta">${escapeHtml(normalizeClass(v.class) || "No class")}</div>
@@ -511,7 +494,7 @@ function renderAllVolunteers() {
     card.innerHTML = `
       <div class="admin-card-header">
         <div style="display:flex;gap:1rem;align-items:center;">
-          <img class="admin-card-image" src="${photo}" alt="${escapeHtml(v.name)}" onerror="this.src='${PLACEHOLDER}'">
+          <img class="admin-card-image" src="${escapeAttr(safeUrl(v.photo_url) || PLACEHOLDER)}"">
           <div>
             <div class="admin-card-title">${escapeHtml(v.name)} ${statusTag}</div>
             <div class="admin-card-meta">${escapeHtml(normalizeClass(v.class) || "No class")}</div>
@@ -556,9 +539,9 @@ function openEditVolunteerModal(volunteer) {
   editModalBody.innerHTML = `
     <h2>Edit volunteer</h2>
     
-    <!-- BOUTON MAGIQUE -->
+    <!-- BOUTON MAGIQUE SÉCURISÉ -->
     <div style="background: var(--honey-soft); padding: 0.8rem; border-radius: 10px; margin-bottom: 1rem;">
-      <button type="button" onclick="copyLoginLink('${volunteer.access_token}')" style="background: var(--honey); color: #4a2c00; border: none; padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">🔗 Copy Login Link</button>
+      <button type="button" id="copy-token-btn" data-token="${escapeAttr(volunteer.access_token)}" style="background: var(--honey); color: #4a2c00; border: none; padding: 0.4rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">🔗 Copy Login Link</button>
       <span style="font-size: 0.8rem; margin-left: 0.5rem; color: #6b4a00;">Send this to the volunteer</span>
     </div>
 
@@ -585,7 +568,7 @@ function openEditVolunteerModal(volunteer) {
       <span class="photo-or">or</span>
       <input type="text" id="edit-photo-url" placeholder="Paste an image URL" value="${escapeAttr(volunteer.photo_url || "")}">
     </div>
-    <img class="preview" id="edit-photo-preview" src="${photo}" alt="preview" onerror="this.src='${PLACEHOLDER}'">
+    <img class="preview" id="edit-photo-preview" src="${escapeAttr(safeUrl(photo) || PLACEHOLDER)}" alt="preview" onerror="this.src='${PLACEHOLDER}'">
     <div id="edit-photo-status" class="photo-status"></div>
 
     <label>Instagram</label>
@@ -667,6 +650,14 @@ function openEditVolunteerModal(volunteer) {
     status.textContent = "✅ Photo uploaded. Click Save to apply.";
     status.classList.add("success");
   });
+
+  // Brancher le bouton de copie du token
+  const copyBtn = document.getElementById("copy-token-btn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      copyLinkToClipboard(copyBtn.dataset.token);
+    });
+  }
 
   document.getElementById("edit-cancel").addEventListener("click", closeEditModal);
   document.getElementById("edit-save").addEventListener("click", () => saveVolunteer(volunteer.id));
@@ -1407,17 +1398,18 @@ document.getElementById("export-volunteers").addEventListener("click", () => {
 });
 
 // 33. Copier le lien de connexion
-window.copyLoginLink = function(token) {
-  // Détecte si on est sur Live Server ou en prod pour créer la bonne URL
-  const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+// Fonction sécurisée pour copier le lien du volontaire
+function copyLinkToClipboard(token) {
+  // On construit l'URL de manière robuste (gère les sous-dossiers comme /gradeeting/)
+  const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
   const url = `${baseUrl}volunteer.html?token=${token}`;
   
   navigator.clipboard.writeText(url).then(() => {
-    alert("✅ Link copied to clipboard!\n\nSend it to the volunteer via WhatsApp.");
+    alert("✅ Link copied to clipboard!\n\nSend it to the volunteer.");
   }).catch(err => {
     prompt("Copy this link manually:", url);
   });
-};
+}
 
 // 7. Lancer au chargement
 checkSession();

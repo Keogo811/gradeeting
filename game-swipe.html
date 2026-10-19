@@ -32,11 +32,10 @@
       padding: 1rem;
     }
 
-    /* --- Décorations Fixes Gauche/Droite (NOPE / LIKE) --- */
     .side-bg {
       position: fixed; top: 50%; transform: translateY(-50%);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 1; pointer-events: none; opacity: 0.7; /* Beaucoup plus visible */
+      z-index: 1; pointer-events: none; opacity: 0.7;
     }
     .side-bg.left { left: 5%; color: var(--rose-deep); }
     .side-bg.right { right: 5%; color: #2b7a4b; }
@@ -46,7 +45,6 @@
     [data-theme="dark"] .side-bg.left { color: var(--rose); }
     [data-theme="dark"] .side-bg.right { color: #74c78d; }
 
-    /* --- Nouvelles Décorations Fixes (Non-effacées) --- */
     .fixed-deco { position: fixed; z-index: 5; pointer-events: none; font-size: 3rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); animation: float-bee 4s ease-in-out infinite; }
     .fixed-deco.bee1 { top: 10%; left: 15%; animation-delay: 0s; }
     .fixed-deco.bee2 { bottom: 15%; right: 15%; animation-delay: -1.5s; font-size: 2rem; }
@@ -55,7 +53,6 @@
     @keyframes float-bee { 0%, 100% { transform: translateY(0) rotate(5deg); } 50% { transform: translateY(-15px) rotate(-5deg); } }
     @keyframes breathe { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
 
-    /* --- Arrière-plan Fun (Cœurs & Croix flottants) --- */
     .bg-decorations { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
     .bg-icon { position: absolute; opacity: 0.15; font-size: 3rem; animation: floatBg 15s linear infinite; }
     [data-theme="dark"] .bg-icon { opacity: 0.08; }
@@ -63,7 +60,6 @@
 
     .back-home { position: absolute; top: 1.5rem; left: 1.5rem; display: inline-flex; align-items: center; gap: 0.4rem; background: var(--white); border: 2px solid var(--rose-soft); color: var(--rose-deep); font-family: 'Fredoka', sans-serif; font-weight: 500; padding: 0.5rem 1rem; border-radius: 999px; text-decoration: none; box-shadow: var(--shadow-md); z-index: 100; }
     
-    /* --- Instruction Overlay --- */
     #instructions {
       position: absolute; inset: 0; background: rgba(30, 24, 25, 0.9); backdrop-filter: blur(8px);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -75,7 +71,6 @@
     #instructions .start-btn { background: var(--rose); color: white; border: none; padding: 1rem 2rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(232, 93, 117, 0.4); margin-top: 1rem; }
     #instructions .start-btn:hover { transform: scale(1.05); }
 
-    /* --- Jeu --- */
     .game-container { 
       position: relative; 
       width: 100%; 
@@ -106,7 +101,6 @@
     .card-class { font-size: 0.95rem; color: var(--text-muted); font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
     .card-desc { font-size: 0.95rem; color: var(--text); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
 
-    /* --- Mode Blind Date --- */
     .card.blind-mode img { filter: blur(20px) scale(1.1); }
     .card.blind-mode .card-info { background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); height: 100%; justify-content: flex-end; padding-bottom: 3rem; }
     .card.blind-mode .card-name { color: var(--honey); }
@@ -117,7 +111,6 @@
     .overlay.like { left: 20px; color: #2b7a4b; border-color: #2b7a4b; transform: rotate(-15deg); }
     .overlay.nope { right: 20px; color: var(--rose-deep); border-color: var(--rose-deep); transform: rotate(15deg); }
 
-    /* --- Boutons d'action --- */
     .actions { display: flex; gap: 1.5rem; margin-top: 1.5rem; z-index: 10; align-items: center; flex-shrink: 0; }
     .action-btn { width: 60px; height: 60px; border-radius: 50%; border: none; background: var(--white); box-shadow: var(--shadow-lg); font-size: 1.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, background 0.2s; }
     .action-btn:hover { transform: scale(1.1); }
@@ -129,14 +122,12 @@
     .particle { position: absolute; font-size: 2rem; pointer-events: none; z-index: 100; animation: floatUp 1s ease-out forwards; }
     @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 1; } 100% { transform: translateY(-150px) scale(1.5); opacity: 0; } }
 
-    /* --- Fin de jeu --- */
     .end-screen { position: absolute; inset: 0; background: rgba(255, 248, 242, 0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; z-index: 50; border-radius: 24px; }
     [data-theme="dark"] .end-screen { background: rgba(30, 24, 25, 0.95); }
     .end-screen h2 { font-family: 'Fredoka', sans-serif; color: var(--rose-deep); font-size: 2.2rem; margin-bottom: 1rem; }
     .end-screen p { margin-bottom: 2rem; color: var(--text-muted); font-size: 1.1rem; }
     .restart-btn { background: linear-gradient(135deg, var(--honey) 0%, #FF8C42 100%); color: var(--text); border: none; padding: 1rem 2rem; border-radius: 999px; font-family: 'Fredoka', sans-serif; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4); }
 
-    /* --- Panneau Paramètres --- */
     .customize-fab { position: absolute; bottom: 1.5rem; right: 1.5rem; width: 50px; height: 50px; border-radius: 50%; background: var(--white); border: 2px solid var(--border); font-size: 1.3rem; cursor: pointer; box-shadow: var(--shadow-md); z-index: 100; display: flex; align-items: center; justify-content: center; }
     .customize-panel { position: absolute; bottom: 5rem; right: 1.5rem; width: 240px; background: var(--white); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 1rem; z-index: 100; border: 2px solid var(--border); display: none; }
     .customize-panel.active { display: block; animation: slideUp 0.2s ease; }
@@ -145,17 +136,14 @@
     .customize-panel button { display: flex; justify-content: space-between; font-family: 'Fredoka'; }
     .customize-panel button:hover { background: var(--rose-soft); }
 
-    /* Cache les décorations latérales sur mobile */
     @media (max-width: 900px) {
       .side-bg, .fixed-deco { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- Fond animé (Cœurs et Croix) -->
   <div class="bg-decorations" id="bg-decorations" aria-hidden="true"></div>
 
-  <!-- Décorations Fixes Latérales (NOPE / LIKE) -->
   <div class="side-bg left">
     <div class="side-icon">❌</div>
     <div class="side-text">NOPE</div>
@@ -165,7 +153,6 @@
     <div class="side-text">LIKE</div>
   </div>
 
-  <!-- Décorations Fixes (Abeilles & Fleurs) -->
   <div class="fixed-deco bee1">🐝</div>
   <div class="fixed-deco bee2">🐝</div>
   <div class="fixed-deco flower1">🐝</div>
@@ -173,7 +160,6 @@
 
   <a href="index.html" class="back-home">← Back</a>
 
-  <!-- Écran d'instructions -->
   <div id="instructions">
     <h1>Swipe & Meet 🎯</h1>
     <p>Discover your campus like never before. Swipe the cards to see who you'd like to meet!</p>
@@ -215,13 +201,13 @@
 
   <audio id="bg-music" loop></audio>
 
+  <script src="security.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
     const SUPABASE_KEY = "sb_publishable_Ke5kkta-zcmT41TIcQTNiA_aQUoGx_t";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- Thème ---
     if (localStorage.getItem("gradeeting_theme") === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
       document.getElementById("theme-status").textContent = "Light";
@@ -239,7 +225,6 @@
       }
     }
 
-    // --- Musique ---
     const audio = document.getElementById("bg-music");
     const musicSelect = document.getElementById("music-select");
     let isPlaying = false;
@@ -266,7 +251,6 @@
       isPlaying = !isPlaying;
     }
 
-    // --- Générateur de sons distincts (Swipe) ---
     function playSound(type) {
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -280,16 +264,14 @@
         const now = ctx.currentTime;
 
         if (type === "like") {
-          // Son aigu style pièce d'arcade (Mario coin)
-          osc.type = "square"; // Son 8-bit
-          osc.frequency.setValueAtTime(987.77, now); // Note B5
-          osc.frequency.setValueAtTime(1318.51, now + 0.08); // Note E6
+          osc.type = "square"; 
+          osc.frequency.setValueAtTime(987.77, now);
+          osc.frequency.setValueAtTime(1318.51, now + 0.08);
           gain.gain.setValueAtTime(0.2, now);
           gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
           osc.start(now);
           osc.stop(now + 0.4);
         } else {
-          // Son grave et agressif de buzzer de jeu télévisé
           osc.type = "sawtooth"; 
           osc.frequency.setValueAtTime(150, now);
           osc.frequency.setValueAtTime(130, now + 0.15);
@@ -301,7 +283,6 @@
       } catch (e) { console.log("Audio not supported"); }
     }
 
-    // --- Fond animé ---
     const bg = document.getElementById("bg-decorations");
     const bgIcons = ["❤️", "❌", "🌸", "✨"];
     for (let i = 0; i < 20; i++) {
@@ -315,7 +296,6 @@
       bg.appendChild(el);
     }
 
-    // --- Logique du jeu ---
     const container = document.getElementById("game-container");
     const endScreen = document.getElementById("end-screen");
     const instructions = document.getElementById("instructions");
@@ -366,14 +346,15 @@
       activeCard.className = "card";
       if (isBlindMode) activeCard.classList.add("blind-mode");
       
-      const photo = vol.photo_url || "https://placehold.co/400x500?text=No+Photo";
+      // SÉCURITÉ XSS ICI
+      const photo = escapeAttr(safeUrl(vol.photo_url) || "https://placehold.co/400x500?text=No+Photo");
       
       activeCard.innerHTML = `
         <img src="${photo}" draggable="false">
         <div class="card-info">
-          <div class="card-name">${vol.name}</div>
-          <div class="card-class">${vol.class || ""}</div>
-          <div class="card-desc">${vol.description || ""}</div>
+          <div class="card-name">${escapeHtml(vol.name)}</div>
+          <div class="card-class">${escapeHtml(vol.class || "")}</div>
+          <div class="card-desc">${escapeHtml(vol.description || "")}</div>
         </div>
         <div class="overlay like">LIKE</div>
         <div class="overlay nope">NOPE</div>

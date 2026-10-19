@@ -106,19 +106,6 @@ function normalizeClass(input) {
   return s;
 }
 
-function safeUrl(url) {
-  if (!url) return null;
-  if (!/^https?:\/\//i.test(url)) return null;
-  return url;
-}
-
-function escapeHtml(text) {
-  if (!text) return "";
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 // 2. Charger les volontaires approuvés
 async function loadVolunteers() {
   listContainer.innerHTML = '<p class="loading">Loading volunteers...</p>';
@@ -230,9 +217,18 @@ function renderVolunteers(volunteers) {
     const socialDiv = document.createElement("div");
     socialDiv.className = "card-socials";
     
-    if (v.instagram) socialDiv.innerHTML += `<a href="https://instagram.com/${v.instagram}" target="_blank" title="Instagram">📸</a>`;
-    if (v.snapchat) socialDiv.innerHTML += `<a href="https://snapchat.com/add/${v.snapchat}" target="_blank" title="Snapchat">👻</a>`;
-    if (v.linkedin) socialDiv.innerHTML += `<a href="${v.linkedin}" target="_blank" title="LinkedIn">💼</a>`;
+    if (v.instagram) {
+      const ig = cleanSocialHandle(v.instagram);
+      if (ig) socialDiv.innerHTML += `<a href="https://instagram.com/${ig}" target="_blank" rel="noopener">📸</a>`;
+    }
+    if (v.snapchat) {
+      const snap = cleanSocialHandle(v.snapchat);
+      if (snap) socialDiv.innerHTML += `<a href="https://snapchat.com/add/${snap}" target="_blank" rel="noopener">👻</a>`;
+    }
+    if (v.linkedin) {
+      const li = safeUrl(v.linkedin);
+      if (li) socialDiv.innerHTML += `<a href="${escapeAttr(li)}" target="_blank" rel="noopener">💼</a>`;
+    }
     
     if (socialDiv.innerHTML !== "") {
       // Empêcher le clic sur les réseaux de déclencher l'ouverture du profil
@@ -362,13 +358,17 @@ async function showVolunteerDetail(volunteerId) {
     ? `<div class="social-links">${socialLinks.join("")}</div>`
     : "";
 
+  // 1. On sécurise l'URL de la photo
+  const safePhoto = escapeAttr(safeUrl(volunteer.photo_url) || PLACEHOLDER);
+  
+  // 2. On injecte le HTML avec échappement
   detailContent.innerHTML = `
     <div class="detail-header">
-      <img src="${photo}" alt="${volunteer.name}" onerror="this.src='${PLACEHOLDER}'">
+      <img src="${safePhoto}" alt="${escapeAttr(volunteer.name)}" onerror="this.src='${PLACEHOLDER}'">
       <div>
-        <h2>${volunteer.name}${pronounBadge}</h2>
+        <h2>${escapeHtml(volunteer.name)}${pronounBadge}</h2>
         ${classLine}
-        <p>${volunteer.description || ""}</p>
+        <p>${escapeHtml(volunteer.description || "")}</p>
         <button class="share-button" id="share-button">🔗 Share this profile</button>
       </div>
     </div>
@@ -1465,11 +1465,12 @@ if (matchBtn && matchCard) {
 
     setTimeout(() => {
       const randomVol = allVolunteers[Math.floor(Math.random() * allVolunteers.length)];
-      const photo = randomVol.photo_url || PLACEHOLDER;
+      // 1. Sécuriser l'URL de la photo
+      const photo = escapeAttr(safeUrl(randomVol.photo_url) || PLACEHOLDER);
       
       matchCard.innerHTML = `
         <div class="match-result">
-          <img src="${photo}" class="match-photo" alt="${randomVol.name}" onerror="this.src='${PLACEHOLDER}'">
+          <img src="${photo}" class="match-photo" alt="${escapeAttr(randomVol.name)}" onerror="this.src='${PLACEHOLDER}'">
           <div class="match-name">${escapeHtml(randomVol.name)}</div>
           <div class="match-class">${escapeHtml(normalizeClass(randomVol.class) || "")}</div>
           <button class="match-profile-btn" id="goto-match">Click then look up for profile</button>

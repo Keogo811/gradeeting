@@ -136,6 +136,7 @@
     </div>
   </div>
 
+  <script src="security.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
@@ -214,39 +215,59 @@
         const div = document.createElement("div");
         div.className = "comment-item";
         
-        let replyHtml = c.reply 
-          ? `<div class="existing-reply"><strong>🌸 Your reply:</strong><p>${c.reply}</p></div>`
-          : `<div class="reply-form"><textarea id="reply-text-${c.id}" placeholder="Write a public reply..."></textarea><button onclick="submitReply('${c.id}')">Reply</button></div>`;
+        let replyHtml = "";
+        if (c.reply) {
+          replyHtml = `
+            <div class="existing-reply">
+              <strong>🌸 Your reply:</strong>
+              <p>${escapeHtml(c.reply)}</p>
+            </div>`;
+        } else {
+          replyHtml = `
+            <div class="reply-form">
+              <textarea id="reply-text-${escapeAttr(c.id)}" placeholder="Write a public reply..."></textarea>
+              <button class="reply-submit-btn" data-id="${escapeAttr(c.id)}">Reply</button>
+            </div>`;
+        }
+
+        // On s'assure que le sentiment est bien soit "positive" soit "negative" pour le CSS
+        const sentimentSafe = c.sentiment === "positive" ? "positive" : "negative";
 
         div.innerHTML = `
-          <div class="comment-sentiment ${c.sentiment === 'positive' ? 'positive' : 'negative'}">${c.sentiment} comment</div>
-          <div class="comment-body">"${c.body}"</div>
+          <div class="comment-sentiment ${sentimentSafe}">${sentimentSafe} comment</div>
+          <div class="comment-body">"${escapeHtml(c.body)}"</div>
           ${replyHtml}
         `;
-        list.appendChild(div);
+        commentsList.appendChild(div);
+      }); // <--- Ligne 242 : Fin de la boucle forEach
+
+      // --- AJOUTE LE NOUVEAU CODE ICI ---
+      document.querySelectorAll(".reply-submit-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          const commentId = e.target.dataset.id;
+          const text = document.getElementById(`reply-text-${commentId}`).value.trim();
+          
+          if (!text) return alert("Please write a reply first.");
+
+          e.target.disabled = true;
+          e.target.textContent = "Sending...";
+
+          const { error } = await supabaseClient.rpc('reply_to_comment', {
+            p_token: token,
+            p_comment_id: commentId,
+            p_reply: text
+          });
+
+          if (error) {
+            alert("Error: " + error.message);
+            e.target.disabled = false;
+            e.target.textContent = "Reply";
+          } else {
+            loadComments(); // Recharge la liste
+          }
+        });
       });
     }
-
-    window.submitReply = async function(commentId) {
-      const text = document.getElementById(`reply-text-${commentId}`).value.trim();
-      if (!text) return alert("Please write a reply first.");
-
-      const btn = event.target;
-      btn.disabled = true; btn.textContent = "Sending...";
-
-      const { error } = await supabaseClient.rpc('reply_to_comment', {
-        p_token: token,
-        p_comment_id: commentId,
-        p_reply: text
-      });
-
-      if (error) {
-        alert("Error posting reply: " + error.message);
-        btn.disabled = false; btn.textContent = "Reply";
-      } else {
-        loadComments();
-      }
-    };
 
     document.getElementById("profile-form").addEventListener("submit", async (e) => {
       e.preventDefault();
