@@ -612,6 +612,13 @@ function openEditVolunteerModal(volunteer) {
   // Quand on choisit un fichier
   photoFileInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
+    let compressedFile = file;
+    try {
+      const options = { maxSizeMB: 0.2, maxWidthOrHeight: 800, useWebWorker: true };
+      compressedFile = await imageCompression(file, options);
+    } catch (error) {
+      console.log("Erreur compression", error);
+    }
     if (!file) return;
 
     // Aperçu immédiat en local

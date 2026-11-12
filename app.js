@@ -677,6 +677,15 @@ signupForm.addEventListener("submit", async (e) => {
   const className = normalizeClass(signupForm.class.value);
   const description = signupForm.description.value.trim();
   const photoFile = signupForm.photo.files[0];
+  // --- COMPRESSION DE L'IMAGE ---
+  let compressedFile = photoFile;
+  try {
+    const options = { maxSizeMB: 0.2, maxWidthOrHeight: 800, useWebWorker: true };
+    compressedFile = await imageCompression(photoFile, options);
+  } catch (error) {
+    console.log("Erreur de compression, on garde l'original", error);
+  }
+  // -----------------------------
   const consent = signupForm.consent.checked;
   const pronouns = signupForm.pronouns.value || null;
   const instagram = signupForm.instagram.value.trim() || null;
@@ -708,12 +717,12 @@ signupForm.addEventListener("submit", async (e) => {
   submitBtn.textContent = "Uploading...";
 
   // 1. Upload de la photo
-  const fileExt = photoFile.name.split(".").pop();
+  const fileExt = compressedFile.name.split(".").pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
   const { error: uploadError } = await supabaseClient.storage
     .from("volunteer-photos")
-    .upload(fileName, photoFile);
+    .upload(fileName, compressedFile); // <-- Utilise le fichier compressé
 
   if (uploadError) {
     console.error("Erreur upload :", uploadError.message);
