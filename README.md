@@ -95,4 +95,8 @@ Aivancity Student
 | Admin Dashboard | Mini-Games |
 | :---: | :---: |
 | ![Admin](screenshots/admin-panel.png) | ![Swipe Game](screenshots/swipe-game.png) |
+<<<<<<< HEAD
 | *Complete CRUD interface with statistics and moderation.* | *Swipe & Meet: A fun, Tinder-style way to discover volunteers.* |
+=======
+| *Complete CRUD interface with statistics and moderation.* | *Swipe & Meet: A fun, Tinder-style way to discover volunteers.* |
+>>>>>>> a01293cb4606ecbece8a4a50702364d9ab30e8a0
