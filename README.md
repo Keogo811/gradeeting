@@ -89,14 +89,10 @@ Aivancity Student
 
 | Homepage | Volunteer Hub |
 | :---: | :---: |
-| ![Homepage](screenshots/homepage.png) | ![Volunteer Hub](screenshots/volunteer-hub.png) |
+| ![Homepage](assets/screenshots/homepage.png) | ![Volunteer Hub](assets/screenshots/volunteer-hub.png) |
 | *Discover the Aivancity community with Glassmorphism UI.* | *The private dashboard where volunteers manage their profile and replies.* |
 
 | Admin Dashboard | Mini-Games |
 | :---: | :---: |
-| ![Admin](screenshots/admin-panel.png) | ![Swipe Game](screenshots/swipe-game.png) |
-<<<<<<< HEAD
+| ![Admin](assets/screenshots/admin-panel.png) | ![Swipe Game](assets/screenshots/swipe-game.png) |
 | *Complete CRUD interface with statistics and moderation.* | *Swipe & Meet: A fun, Tinder-style way to discover volunteers.* |
-=======
-| *Complete CRUD interface with statistics and moderation.* | *Swipe & Meet: A fun, Tinder-style way to discover volunteers.* |
->>>>>>> a01293cb4606ecbece8a4a50702364d9ab30e8a0

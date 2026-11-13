@@ -190,10 +190,10 @@
     <button onclick="toggleTheme()">🌙 Theme <span id="theme-status">Dark</span></button>
     
     <select id="music-select" style="margin-bottom: 0.5rem;">
-      <option value="music/musique.mp3">🎵 Can-Can (Default)</option>
-      <option value="music/german.mp3">🎧 Lofi German</option>
-      <option value="music/mongol.mp3">🐎 Mongol Throats</option>
-      <option value="music/russian.mp3">🌿 Russian Sounds</option>
+      <option value="assets/music/musique.mp3">🎵 Can-Can (Default)</option>
+      <option value="assets/music/german.mp3">🎧 Lofi German</option>
+      <option value="assets/music/mongol.mp3">🐎 Mongol Throats</option>
+      <option value="assets/music/russian.mp3">🌿 Russian Sounds</option>
     </select>
     
     <button onclick="toggleMusic()">🎵 Music <span id="music-status">Off</span></button>
@@ -201,7 +201,7 @@
 
   <audio id="bg-music" loop></audio>
 
-  <script src="security.js"></script>
+  <script src="js/security.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://pwsdatsdgmvsaptowadl.supabase.co";
@@ -229,7 +229,7 @@
     const musicSelect = document.getElementById("music-select");
     let isPlaying = false;
 
-    const savedTrack = localStorage.getItem("gradeeting_music_track") || "music/musique.mp3";
+    const savedTrack = localStorage.getItem("gradeeting_music_track") || "assets/music/musique.mp3";
     audio.src = savedTrack;
     musicSelect.value = savedTrack;
 

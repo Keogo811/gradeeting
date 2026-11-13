@@ -1352,7 +1352,7 @@ if (!audio) {
 }
 
 // Charger la piste sauvegardée ou celle par défaut
-const savedTrack = localStorage.getItem(MUSIC_TRACK_KEY) || "music/musique.mp3";
+const savedTrack = localStorage.getItem(MUSIC_TRACK_KEY) || "assets/music/musique.mp3";
 if (musicSelect) {
   musicSelect.value = savedTrack;
 }
