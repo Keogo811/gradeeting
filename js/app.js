@@ -16,6 +16,8 @@ const clearFiltersBtn = document.getElementById("clear-filters");
 
 let currentVolunteerId = null;
 let allVolunteers = [];
+let listScrollY = null;       // position dans la liste avant d'ouvrir un profil
+let openedFromList = false;   // true si le profil a été ouvert depuis le site (pas via un lien partagé)
 
 const PLACEHOLDER = "https://placehold.co/300x180?text=No+Photo";
 
@@ -185,7 +187,7 @@ function renderVolunteers(volunteers) {
   volunteers.forEach((v) => {
     const card = document.createElement("div");
     card.className = "volunteer-card";
-    card.addEventListener("click", () => showVolunteerDetail(v.id));
+    card.addEventListener("click", () => openVolunteer(v.id));
 
     const img = document.createElement("img");
     img.src = v.photo_url || PLACEHOLDER;
@@ -263,6 +265,11 @@ function clearFilters() {
 
 // 7. Afficher le détail d'un volontaire
 async function showVolunteerDetail(volunteerId) {
+  // Mémoriser la position dans la liste pour y revenir au retour
+  if (listContainer.style.display !== "none") {
+    listScrollY = window.scrollY;
+  }
+
   currentVolunteerId = volunteerId;
 
   listContainer.style.display = "none";
@@ -272,6 +279,9 @@ async function showVolunteerDetail(volunteerId) {
   detailContainer.style.animation = "none";
   void detailContainer.offsetWidth;
   detailContainer.style.animation = "";
+
+  // Amener le profil à l'écran (sinon on reste plus bas, sur les mini-jeux)
+  detailContainer.scrollIntoView({ behavior: "smooth", block: "start" });
 
   detailContent.innerHTML = '<p class="loading">Loading profile...</p>';
 
@@ -482,6 +492,15 @@ async function showVolunteerDetail(volunteerId) {
 
   setupCommentForm();
   setupShareButton(volunteer);
+
+  // Si du contenu au-dessus s'est chargé entre-temps (ex. "Star of the day" lors d'un lien partagé),
+  // le profil a pu être repoussé vers le bas : on le ramène en haut de l'écran.
+  if (currentVolunteerId === volunteerId) {
+    const top = detailContainer.getBoundingClientRect().top;
+    if (top > 120 || top < -120) {
+      detailContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 }
 
 // 8. Brancher le formulaire
@@ -564,11 +583,25 @@ function showList() {
   detailContent.innerHTML = "";
   currentVolunteerId = null;
   if (window.location.hash.startsWith("#volunteer=")) {
-    history.replaceState(null, "", window.location.pathname);
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
+  // Revenir là où on était dans la liste
+  if (listScrollY !== null) {
+    window.scrollTo({ top: listScrollY, behavior: "instant" });
+    listScrollY = null;
   }
 }
 
-backButton.addEventListener("click", showList);
+backButton.addEventListener("click", () => {
+  // Profil ouvert depuis la liste : on recule dans l'historique (comme le bouton Retour du téléphone)
+  if (openedFromList) {
+    history.back();
+  } else {
+    // Arrivé directement via un lien partagé : pas d'historique interne, on affiche la liste
+    showList();
+  }
+});
 
 // 10. Brancher les filtres
 searchInput.addEventListener("input", applyFilters);
@@ -849,12 +882,30 @@ function setupShareButton(volunteer) {
   });
 }
 
-// 18. Ouvrir un profil via #volunteer=<id> dans l'URL
+// 18. Navigation par URL : chaque profil a sa propre adresse (#volunteer=<id>)
+//     → le bouton Retour du navigateur / téléphone revient à la liste,
+//     et un lien partagé ouvre directement le bon profil.
+function openVolunteer(volunteerId) {
+  const target = `#volunteer=${volunteerId}`;
+  if (window.location.hash === target) {
+    showVolunteerDetail(volunteerId);
+    return;
+  }
+  openedFromList = true;
+  window.location.hash = target; // ajoute une entrée d'historique → déclenche hashchange
+}
+
 function handleHashOnLoad() {
   const hash = window.location.hash;
   const match = hash.match(/^#volunteer=([0-9a-f-]{36})$/i);
   if (match) {
-    showVolunteerDetail(match[1]);
+    if (match[1] !== currentVolunteerId) {
+      showVolunteerDetail(match[1]);
+    }
+  } else if (currentVolunteerId !== null) {
+    // Retour arrière depuis un profil → on réaffiche la liste
+    openedFromList = false;
+    showList();
   }
 }
 
@@ -953,7 +1004,7 @@ function renderFeatured(volunteers) {
   section.classList.remove("hidden");
 
   // Ouvrir le profil au clic
-  section.onclick = () => showVolunteerDetail(featured.id);
+  section.onclick = () => openVolunteer(featured.id);
   section.style.cursor = "pointer";
 }
 
@@ -1487,7 +1538,7 @@ if (matchBtn && matchCard) {
       `;
 
       document.getElementById("goto-match").addEventListener("click", () => {
-        showVolunteerDetail(randomVol.id);
+        openVolunteer(randomVol.id);
       });
 
       matchBtn.disabled = false;
