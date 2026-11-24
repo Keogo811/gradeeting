@@ -3022,3 +3022,84 @@ body {
     padding: 1.4rem;
   }
 }
+/* =========================================
+   FIX — Header sans chevauchement + boutons flottants au-dessus du badge Netlify
+   ========================================= */
+
+/* Les deux pubs de jeux passent dans le flux normal, sous la nav,
+   au lieu d'être en position absolue par-dessus le lien "Volunteer Hub" et les boutons. */
+.game-promos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.game-promos .game-promo,
+.game-promos .game-promo1 {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  margin: 0;
+  width: auto;
+}
+
+/* Le bouton Menu est en position absolue en haut à gauche :
+   sur les écrans étroits, on laisse de la place au-dessus du titre pour qu'il ne le recouvre pas. */
+@media (max-width: 700px) {
+  .site-header {
+    padding-top: 3.8rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-promos {
+    gap: 0.7rem;
+  }
+  .game-promos .game-promo,
+  .game-promos .game-promo1 {
+    animation: none; /* moins distrayant sur mobile */
+  }
+}
+
+/* Netlify ajoute un badge "Powered by Netlify" (iframe ~64px de haut) en bas à droite :
+   on remonte la pile de boutons flottants pour qu'aucun ne soit caché dessous. */
+.back-to-top {
+  bottom: 5rem;
+}
+.suggest-fab {
+  bottom: 9.5rem;
+}
+.customize-fab {
+  bottom: 14rem;
+}
+.customize-panel {
+  bottom: 17.5rem;
+}
+
+@media (max-width: 600px) {
+  .back-to-top {
+    bottom: 5rem;
+    right: 1rem;
+  }
+  .suggest-fab {
+    bottom: 9.2rem;
+    right: 1rem;
+  }
+  .customize-fab {
+    bottom: 13.2rem;
+    right: 1rem;
+  }
+  .customize-panel {
+    bottom: 16.8rem;
+    right: 1rem;
+  }
+}
+
+/* Quand on ouvre un profil, on le fait défiler à l'écran avec un peu d'air au-dessus du bouton "Back" */
+#volunteer-detail {
+  scroll-margin-top: 1.5rem;
+}

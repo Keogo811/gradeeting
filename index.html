@@ -62,20 +62,21 @@
       <button id="nav-volunteer" class="nav-link" type="button">✨ Become a volunteer</button>
     </nav>
 
-    <!-- Publicités pour les jeux -->
-    <a href="game-swipe.html" class="game-promo" style="background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);">
-      <span class="promo-icon">❤️</span>
-      <div class="promo-text">
-        <strong>🎮Swipe & Meet🎮!</strong>
-        <span>Tinder-style</span>
-      </div>
-    </a>
-      
+    <!-- Publicités pour les jeux (dans le flux normal → ne chevauchent plus le reste du header) -->
+    <div class="game-promos">
       <a href="game-guess-who.html" class="game-promo1">
-        <span class="promo-icon">🕵️‍♂️</span>
+        <span class="promo-icon" aria-hidden="true">🕵️‍♂️</span>
         <div class="promo-text">
           <strong>🎮Guess Who?🎮</strong>
           <span>Detective-style</span>
+        </div>
+      </a>
+
+      <a href="game-swipe.html" class="game-promo" style="background: linear-gradient(135deg, var(--rose) 0%, var(--rose-deep) 100%);">
+        <span class="promo-icon" aria-hidden="true">❤️</span>
+        <div class="promo-text">
+          <strong>🎮Swipe & Meet🎮!</strong>
+          <span>Tinder-style</span>
         </div>
       </a>
     </div>
