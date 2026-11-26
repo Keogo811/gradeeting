@@ -330,6 +330,18 @@
     "This profile is already linked to another email. Contact the admin.": "Ce profil est déjà relié à un autre email. Contacte l'admin.",
     "Your email is already linked to another profile. Contact the admin.": "Ton email est déjà relié à un autre profil. Contacte l'admin.",
     "🌸 Volunteer replied:": "🌸 Réponse du volontaire :",
+    // Ancien Espace volontaire (connexion par lien personnel)
+    "🔒 Access Denied": "🔒 Accès refusé",
+    "You need a valid login link to access this page, 🚨this link is given to you by the admin🚨.":
+      "Il te faut un lien de connexion valide pour accéder à cette page, 🚨c'est l'admin qui te le donne🚨.",
+    "Please check your messages (WhatsApp or Email) for the personal link the admin sent you.":
+      "Regarde tes messages (WhatsApp ou email) : l'admin t'y a envoyé ton lien personnel.",
+    "Lost your link? Contact the admin on campus to get a new one.": "Lien perdu ? Contacte l'admin sur le campus pour en avoir un nouveau.",
+    "You are securely logged in.": "Tu es connecté en toute sécurité.",
+    "Log out": "Se déconnecter",
+    "Access your hub here": "Accède à ton espace ici",
+    "Contact email": "Email de contact",
+    "Thank you! Your profile will appear after admin review.": "Merci ! Ton profil apparaîtra après validation par l'admin.",
 
     // ---------- FAQ ----------
     "Everything you need to know about Gradeeting": "Tout ce qu'il faut savoir sur Gradeeting",
