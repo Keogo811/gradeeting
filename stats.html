@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/i18n.js"></script>
   <title>Stats — GRADEETING</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -390,6 +391,9 @@
       document.getElementById("kpi-comments").textContent = comments.length;
       document.getElementById("kpi-visits").textContent = visitsCount;
 
+      // Les graphiques sont dessinés dans des <canvas> : on traduit leurs libellés ici
+      const t = (str) => (window.GradeetingI18n ? GradeetingI18n.t(str) : str);
+
       // Préparer les charts
       wrapper.innerHTML = `
         <div class="chart-card">
@@ -425,7 +429,7 @@
       new Chart(document.getElementById("chart-classes"), {
         type: "bar",
         data: {
-          labels: classLabels,
+          labels: classLabels.map(t),
           datasets: [{
             data: classData,
             backgroundColor: [COLORS.rose, COLORS.honey, COLORS.purple, COLORS.blue, COLORS.coral, COLORS.green, COLORS.roseSoft],
@@ -451,7 +455,7 @@
       new Chart(document.getElementById("chart-sentiment"), {
         type: "doughnut",
         data: {
-          labels: ["Positive", "Negative"],
+          labels: [t("Positive"), t("Negative")],
           datasets: [{
             data: [positive, negative],
             backgroundColor: [COLORS.green, COLORS.roseDeep],
@@ -544,14 +548,14 @@
         const nameMap = {};
         (topVols || []).forEach(v => { nameMap[v.id] = v.name; });
 
-        topLabels = topIds.map(id => nameMap[id] || "Unknown");
+        topLabels = topIds.map(id => nameMap[id] || t("Unknown"));
         topData = topIds.map(id => commentCounts[id]);
       }
 
       new Chart(document.getElementById("chart-top"), {
         type: "bar",
         data: {
-          labels: topLabels.length > 0 ? topLabels : ["No comments yet"],
+          labels: topLabels.length > 0 ? topLabels : [t("No comments yet")],
           datasets: [{
             data: topData.length > 0 ? topData : [0],
             backgroundColor: COLORS.honey,
