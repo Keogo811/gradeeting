@@ -963,17 +963,34 @@ async function deleteComment(comment) {
     message.textContent = "";
     message.className = "modal-message";
 
-    const { error } = await supabaseClient
+    // .select("id") renvoie les lignes vraiment supprimées : si Supabase refuse
+    // la suppression (pas de droit DELETE), il ne renvoie PAS d'erreur, juste 0 ligne.
+    const { data: deleted, error } = await supabaseClient
       .from("comments")
       .delete()
-      .eq("id", comment.id);
+      .eq("id", comment.id)
+      .select("id");
 
-    if (error) {
-      console.error("Erreur suppression :", error.message);
-      message.textContent = "❌ Error deleting. Please try again.";
+    const failWith = (text) => {
+      message.textContent = text;
       message.classList.add("error");
       confirmBtn.disabled = false;
       confirmBtn.textContent = "🗑️ Permanently delete";
+    };
+
+    if (error) {
+      console.error("Erreur suppression :", error.message);
+      if (/foreign key/i.test(error.message)) {
+        failWith("❌ Not deleted: this comment still has reactions or reports attached. Run supabase/migrations/20261126_fix_admin_comment_delete.sql once in Supabase.");
+      } else {
+        failWith("❌ Error deleting: " + error.message);
+      }
+      return;
+    }
+
+    if (!deleted || deleted.length === 0) {
+      console.error("Suppression refusée : 0 ligne supprimée (pas de politique DELETE sur comments ?)");
+      failWith("❌ Not deleted: the database doesn't allow the admin to delete comments yet. Run supabase/migrations/20261126_fix_admin_comment_delete.sql once in Supabase.");
       return;
     }
 
